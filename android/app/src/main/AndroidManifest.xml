@@ -26,7 +26,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- Callback Deep Link dari Dompet Kampus Global -->
+            <!-- Callback Deep Link -->
             <intent-filter android:autoVerify="false">
                 <action android:name="android.intent.action.VIEW" />
 
@@ -47,12 +47,20 @@
 
     </application>
 
-    <!-- Digunakan Flutter untuk Process Text -->
     <queries>
+
+        <!-- Digunakan Flutter untuk Process Text -->
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT" />
             <data android:mimeType="text/plain" />
         </intent>
+
+        <!-- Digunakan untuk mengecek aplikasi Dompet Kampus Global -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="dompetkampus" />
+        </intent>
+
     </queries>
 
 </manifest>
