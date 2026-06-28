@@ -47,6 +47,11 @@
 		</dict>
 	</array>
 
+	<key>LSApplicationQueriesSchemes</key>    
+    <array>    
+        <string>dompetkampus</string>    <!-- ← Dompet Kampus Global -->    
+    </array>
+
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 
