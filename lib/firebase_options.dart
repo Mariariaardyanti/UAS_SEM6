@@ -50,13 +50,13 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBxWhB3V_8B4wxM6L3_0MPznKNm2tGW5EE',
-    appId: '1:580906952535:web:e7d9cc5feee0ff09e2c012',
-    messagingSenderId: '580906952535',
-    projectId: 'kampus-flutter',
-    authDomain: 'kampus-flutter.firebaseapp.com',
-    storageBucket: 'kampus-flutter.firebasestorage.app',
-  );
+  apiKey: 'AIzaSyBdOd_uGidx6JqdL-sH-hsobtYkA0SoVGw',
+  appId: '1:381003064522:web:xxxxxxxxxxxxxxxx',
+  messagingSenderId: '381003064522',
+  projectId: 'week-3-verif',
+  authDomain: 'week-3-verif.firebaseapp.com',
+  storageBucket: 'week-3-verif.firebasestorage.app',
+);
 
   static const FirebaseOptions android = FirebaseOptions(
   apiKey: 'AIzaSyBdOd_uGidx6JqdL-sH-hsobtYkA0SoVGw',
