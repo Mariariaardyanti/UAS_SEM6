@@ -59,10 +59,10 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAUoUbTiH9_dOg3g34955BNMxXpv4NRqDg',
-    appId: '1:580906952535:android:9901ffb8e4576a87e2c012',
-    messagingSenderId: '580906952535',
-    projectId: 'kampus-flutter',
-    storageBucket: 'kampus-flutter.firebasestorage.app',
-  );
+  apiKey: 'AIzaSyBdOd_uGidx6JqdL-sH-hsobtYkA0SoVGw',
+  appId: '1:381003064522:android:69fc32b1a4a2d19164c033',
+  messagingSenderId: '381003064522',
+  projectId: 'week-3-verif',
+  storageBucket: 'week-3-verif.firebasestorage.app',
+);
 }
