@@ -1,6 +1,12 @@
 class ApiConstants {
   // Ganti dengan URL backend kamu
-  static const String baseUrl = 'http://192.168.0.5:8081/v1';
+  static const String baseUrl = 'http://192.168.1.2:8081/v1';
+  
+  static void debug() {
+    print("================================");
+    print("BASE URL = $baseUrl");
+    print("================================");
+  }
 
   // Auth endpoints
   static const String verifyToken = '/auth/verify-token';
@@ -16,6 +22,9 @@ class ApiConstants {
   // Order endpoints
   static const String orders = '/orders';
   static const String checkout = '/orders/checkout';
+
+  static const setupOTP = "/auth/setup-otp";
+  static const verifyOTP = "/auth/verify-otp";
 
   // Timeouts
   static const int connectTimeout = 15000; // ms

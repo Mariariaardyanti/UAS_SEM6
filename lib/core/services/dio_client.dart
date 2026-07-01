@@ -70,10 +70,6 @@ class DioClient {
           }
           debugPrint('└─────────────────────────────────────────────');
 
-          // Auto logout jika 401 Unauthorized
-          if (error.response?.statusCode == 401) {
-            await SecureStorageService.clearAll();
-          }
           handler.next(error);
         },
       ),
@@ -84,10 +80,19 @@ class DioClient {
       InterceptorsWrapper(
         onRequest: (options, handler) async {
           final token = await SecureStorageService.getToken();
+
+          debugPrint('================================');
+          debugPrint('[AUTH] Stored Token: $token');
+
           if (token != null) {
             options.headers['Authorization'] = 'Bearer $token';
-            debugPrint('[BACKEND] Authorization token injected');
+            debugPrint('[AUTH] Authorization header injected');
+          } else {
+            debugPrint('[AUTH] Token tidak ditemukan di SecureStorage');
           }
+
+          debugPrint('================================');
+
           handler.next(options);
         },
       ),

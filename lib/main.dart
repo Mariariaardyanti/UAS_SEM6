@@ -12,11 +12,17 @@ import 'package:pasar_malam/features/cart/presentation/providers/cart_provider.d
 import 'package:pasar_malam/features/dashboard/presentation/providers/product_provider.dart';
 import 'package:pasar_malam/features/order/presentation/providers/order_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:pasar_malam/core/constants/api_constants.dart';
 
 import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  print("===============");
+  print("BASE URL = ${ApiConstants.baseUrl}");
+  print("===============");
+
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await NotificationService.initialize();

@@ -179,8 +179,21 @@ class AuthProvider extends ChangeNotifier {
       final data = response.data['data'] as Map<String, dynamic>;
       final backendToken = data['access_token'] as String;
       _backendToken = backendToken;
-
       await SecureStorageService.saveToken(backendToken);
+
+      final savedToken = await SecureStorageService.getToken();
+
+      debugPrint("====================================");
+      debugPrint("[AUTH] Backend JWT berhasil disimpan");
+      debugPrint("[AUTH] Token = $savedToken");
+      debugPrint("====================================");
+
+      _backendToken = backendToken;
+
+      _status = AuthStatus.authenticated;
+      notifyListeners();
+
+      await NotificationService.updateFcmToken();
       debugPrint('[AUTH] Backend JWT tersimpan di SecureStorage');
 
       _status = AuthStatus.authenticated;
@@ -294,6 +307,39 @@ class AuthProvider extends ChangeNotifier {
     _status = AuthStatus.unauthenticated;
     debugPrint('[AUTH] Logout berhasil, token dihapus');
     notifyListeners();
+  }
+
+  Future<Map<String, dynamic>?> setupOTP() async {
+    try {
+      final response = await DioClient.instance.post(
+        '/auth/setup-otp',
+      );
+
+      return response.data['data'];
+    } catch (e) {
+      debugPrint('Setup OTP gagal: $e');
+      return null;
+    }
+  }
+
+  Future<bool> verifyOTP({
+    required String secret,
+    required String code,
+  }) async {
+    try {
+      final response = await DioClient.instance.post(
+        '/auth/verify-otp',
+        data: {
+          'secret': secret,
+          'code': code,
+        },
+      );
+
+      return response.data['success'] == true;
+    } catch (e) {
+      debugPrint('Verify OTP gagal: $e');
+      return false;
+    }
   }
 
   // ─── Private Helpers ────────────────────────────────────

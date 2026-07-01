@@ -12,6 +12,7 @@ import 'package:pasar_malam/features/order/presentation/pages/my_orders_page.dar
 import 'package:pasar_malam/features/order/presentation/pages/order_success_page.dart';
 import 'package:pasar_malam/features/order/presentation/pages/payment_pending_page.dart';
 import 'package:provider/provider.dart';
+import 'package:pasar_malam/features/auth/presentation/pages/setup_otp_page.dart';
 
 class AppRouter {
   static const String splash = '/';
@@ -24,6 +25,7 @@ class AppRouter {
   static const String orderSuccess = '/order-success';
   static const String myOrders = '/my-orders';
   static const String paymentPending = '/payment-pending';
+  static const String setupOtp = '/setup-otp';
 
   static Map<String, WidgetBuilder> get routes => {
         splash: (_) => const SplashPage(),
@@ -34,6 +36,7 @@ class AppRouter {
         cart: (_) => const CartPage(),
         checkout: (_) => const CheckoutPage(),
         myOrders: (_) => const MyOrdersPage(),
+        
         orderSuccess: (context) {
           final order =
               ModalRoute.of(context)!.settings.arguments as OrderModel;
@@ -44,6 +47,7 @@ class AppRouter {
               ModalRoute.of(context)!.settings.arguments as OrderModel;
           return PaymentPendingPage(order: order);
         },
+        setupOtp: (_) => const SetupOTPPage(),
       };
 }
 

@@ -6,6 +6,8 @@ import 'package:pasar_malam/core/routes/app_router.dart';
 import 'package:pasar_malam/core/services/global_institute_pay_service.dart';
 import 'package:pasar_malam/features/order/data/models/order_model.dart';
 import 'package:pasar_malam/features/order/presentation/providers/order_provider.dart';
+import 'package:pasar_malam/core/services/dio_client.dart';
+import 'package:pasar_malam/core/constants/api_constants.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -22,6 +24,14 @@ class PaymentPendingPage extends StatefulWidget {
 
 class _PaymentPendingPageState extends State<PaymentPendingPage>
  with WidgetsBindingObserver {
+  Map<String, dynamic>? _otpData;
+  bool _loadingOtp = false;
+  bool _otpVerified = false;
+  bool _otpReady = false;
+  bool _otpSessionActive = false;
+  
+
+  final TextEditingController _otpController = TextEditingController();
  bool _payLaunched = false;
  StreamSubscription<PaymentCallbackData>? _callbackSub;
 
@@ -35,14 +45,14 @@ class _PaymentPendingPageState extends State<PaymentPendingPage>
 
  WidgetsBinding.instance.addObserver(this);
 
- if (widget.order.paymentMethod == 'global_institute_pay') {
- _log(' Akan auto-launch Dompet Kampus Global setelah frame pertama');
- WidgetsBinding.instance
- .addPostFrameCallback((_) => _launchGlobalInstitutePay());
- } else {
- _log('ℹ Metode bukan global_institute_pay → skip auto-launch '
- '(method=${widget.order.paymentMethod})');
- }
+if (widget.order.paymentMethod == 'global_institute_pay') {
+  _log('Payment Global Institute Pay dipilih');
+} else {
+  _log(
+    'ℹ Metode bukan global_institute_pay '
+    '(method=${widget.order.paymentMethod})',
+  );
+}
 
  _log('⏱ Memulai polling backend (orderId=${widget.order.id})');
  context.read<OrderProvider>().startPaymentPolling(widget.order.id);
@@ -155,6 +165,129 @@ class _PaymentPendingPageState extends State<PaymentPendingPage>
  }
  }
 
+ // ==============================
+// Setup OTP
+// ==============================
+Future<void> _setupOtp() async {
+  if (_otpSessionActive) return;
+
+  setState(() {
+    _loadingOtp = true;
+    _otpSessionActive = true;
+  });
+
+  try {
+    final response = await DioClient.instance.post(
+      ApiConstants.setupOTP,
+    );
+
+    if (response.data["success"] == true) {
+      setState(() {
+        _otpData = response.data["data"];
+        _otpVerified = false;
+        _otpReady = false;
+      });
+
+      _showOtpDialog();
+      _log("OTP Setup berhasil");
+    } else {
+      _otpSessionActive = false;
+    }
+  } catch (e) {
+    _log("Setup OTP gagal : $e");
+    _otpSessionActive = false;
+  } finally {
+    setState(() {
+      _loadingOtp = false;
+    });
+  }
+}
+
+Future<void> _verifyOtp() async {
+  if (_otpData == null) return;
+
+  try {
+    final response = await DioClient.instance.post(
+      ApiConstants.verifyOTP,
+      data: {
+        "secret": _otpData!["secret"],
+        "code": _otpController.text,
+      },
+    );
+
+    if (response.data["success"] == true) {
+      setState(() {
+        _otpVerified = true;
+        _otpReady = true;
+      });
+
+      if (mounted) Navigator.pop(context);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("OTP berhasil diverifikasi")),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Kode OTP salah")),
+      );
+    }
+  } catch (e) {
+    _log("Verify OTP gagal : $e");
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Verifikasi OTP gagal")),
+    );
+  }
+}
+ 
+
+void _showOtpDialog() {
+  if (_otpData == null) return;
+
+  _otpController.clear();
+
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) {
+      return AlertDialog(
+        title: const Text("Aktifkan Google Authenticator"),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.network(
+                _otpData!["qr_code"],
+                height: 200,
+              ),
+              const SizedBox(height: 20),
+              Text(
+                "Secret Key:\n${_otpData!["secret"]}",
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                controller: _otpController,
+                decoration: const InputDecoration(
+                  labelText: "Kode OTP",
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.number,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: _verifyOtp,
+            child: const Text("Verifikasi"),
+          ),
+        ],
+      );
+    },
+  );
+}
+
  String _formatPrice(double price) {
  final str = price.toInt().toString();
  final buffer = StringBuffer();
@@ -244,22 +377,41 @@ class _PaymentPendingPageState extends State<PaymentPendingPage>
  ),
  ),
  body: order.paymentMethod == 'virtual_account'
- ? _VirtualAccountBody(
- order: order,
- payStatus: payStatus,
- formatPrice: _formatPrice,
- onCheckStatus: () =>
- context.read<OrderProvider>().checkPaymentStatus(order.id),
- )
- : _GlobalInstitutePayBody(
- order: order,
- payStatus: payStatus,
- formatPrice: _formatPrice,
- payLaunched: _payLaunched,
- onOpenApp: _launchGlobalInstitutePay,
- onCheckStatus: () =>
- context.read<OrderProvider>().checkPaymentStatus(order.id),
- ),
+    ? _VirtualAccountBody(
+        order: order,
+        payStatus: payStatus,
+        formatPrice: _formatPrice,
+        onCheckStatus: () =>
+            context.read<OrderProvider>().checkPaymentStatus(order.id),
+      )
+    : _GlobalInstitutePayBody(
+        order: order,
+        payStatus: payStatus,
+        formatPrice: _formatPrice,
+        payLaunched: _payLaunched,
+        onOpenApp: () async {
+          // Kalau OTP belum siap, arahkan dulu ke halaman setup OTP
+          if (!_otpReady) {
+            final verified = await Navigator.pushNamed(context, AppRouter.setupOtp);
+  if (verified == true) {
+    setState(() => _otpReady = true);
+    await _launchGlobalInstitutePay(); // ini yang benar-benar buka Dompet Kampus Global
+  }
+
+            // Hanya lanjut buka dompet kalau user BENAR-BENAR verifikasi
+            if (verified == true) {
+              setState(() => _otpReady = true);
+              await _launchGlobalInstitutePay();
+            }
+            return; // stop di sini, jangan lanjut ke bawah
+          }
+
+          // OTP sudah pernah diverifikasi sebelumnya → langsung buka
+          await _launchGlobalInstitutePay();
+        },
+        onCheckStatus: () =>
+            context.read<OrderProvider>().checkPaymentStatus(order.id),
+      ),
  ),
  );
  }
@@ -293,6 +445,17 @@ class _PaymentPendingPageState extends State<PaymentPendingPage>
  ),
  ),
  ),
+ if (!_otpReady) ...[
+  const SizedBox(height: 10),
+  Text(
+    "Silakan selesaikan OTP dulu sebelum lanjut pembayaran",
+    textAlign: TextAlign.center,
+    style: TextStyle(
+      fontSize: 12,
+      color: Colors.grey,
+    ),
+  ),
+]
  ],
  ),
  );
@@ -571,7 +734,7 @@ class _GlobalInstitutePayBody extends StatelessWidget {
  final PaymentCheckStatus payStatus;
  final String Function(double) formatPrice;
  final bool payLaunched;
- final VoidCallback onOpenApp;
+ final Future<void> Function() onOpenApp;
  final VoidCallback onCheckStatus;
 
  const _GlobalInstitutePayBody({

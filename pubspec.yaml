@@ -46,6 +46,7 @@ dependencies:
   equatable: ^2.0.5
   url_launcher: ^6.3.1
   app_links: ^6.3.2
+  qr_flutter: ^4.1.0
 
   # Biometric app lock — library lokal
   flutter_biometric_kit:
