@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -341,6 +342,48 @@ class AuthProvider extends ChangeNotifier {
       return false;
     }
   }
+
+  Future<bool> tryAutoLogin() async {
+  _setLoading();
+  final token = await SecureStorageService.getToken();
+  if (token == null) {
+    _status = AuthStatus.unauthenticated;
+    notifyListeners();
+    return false;
+  }
+
+  _backendToken = token;
+  _firebaseUser = _auth.currentUser;
+
+  try {
+    // Pakai endpoint cart sebagai "ping" validasi token — ringan dan sudah ada
+    await DioClient.instance.get(ApiConstants.cart);
+    _status = AuthStatus.authenticated;
+    notifyListeners();
+    return true;
+  } on DioException catch (e) {
+    if (e.response?.statusCode == 401) {
+      // Token benar-benar invalid/expired di server
+      debugPrint('[AUTH] tryAutoLogin: token invalid (401), hapus token');
+      await SecureStorageService.clearAll();
+      _status = AuthStatus.unauthenticated;
+      notifyListeners();
+      return false;
+    }
+    // Network error, timeout, server down, dll — JANGAN hapus token.
+    // Percaya token lokal, biar interceptor yang urus kalau memang expired
+    // saat request berikutnya.
+    debugPrint('[AUTH] tryAutoLogin: network error, pakai token lokal → $e');
+    _status = AuthStatus.authenticated;
+    notifyListeners();
+    return true;
+  } catch (e) {
+    debugPrint('[AUTH] tryAutoLogin: error tak terduga → $e');
+    _status = AuthStatus.authenticated; // tetap percaya token lokal
+    notifyListeners();
+    return true;
+  }
+}
 
   // ─── Private Helpers ────────────────────────────────────
   void _setLoading() {

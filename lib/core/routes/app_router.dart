@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:pasar_malam/core/services/secure_storage.dart';
 import 'package:pasar_malam/features/auth/presentation/pages/login_page.dart';
 import 'package:pasar_malam/features/auth/presentation/pages/register_page.dart';
 import 'package:pasar_malam/features/auth/presentation/pages/verify_email_page.dart';
@@ -12,7 +11,6 @@ import 'package:pasar_malam/features/order/presentation/pages/my_orders_page.dar
 import 'package:pasar_malam/features/order/presentation/pages/order_success_page.dart';
 import 'package:pasar_malam/features/order/presentation/pages/payment_pending_page.dart';
 import 'package:provider/provider.dart';
-import 'package:pasar_malam/features/auth/presentation/pages/setup_otp_page.dart';
 
 class AppRouter {
   static const String splash = '/';
@@ -25,7 +23,7 @@ class AppRouter {
   static const String orderSuccess = '/order-success';
   static const String myOrders = '/my-orders';
   static const String paymentPending = '/payment-pending';
-  static const String setupOtp = '/setup-otp';
+  
 
   static Map<String, WidgetBuilder> get routes => {
         splash: (_) => const SplashPage(),
@@ -47,14 +45,12 @@ class AppRouter {
               ModalRoute.of(context)!.settings.arguments as OrderModel;
           return PaymentPendingPage(order: order);
         },
-        setupOtp: (_) => const SetupOTPPage(),
       };
 }
 
 /// Proteksi halaman — hanya user terautentikasi yang dapat masuk
 class AuthGuard extends StatelessWidget {
   final Widget child;
-
   const AuthGuard({super.key, required this.child});
 
   @override
@@ -63,6 +59,8 @@ class AuthGuard extends StatelessWidget {
     return switch (status) {
       AuthStatus.authenticated => child,
       AuthStatus.emailNotVerified => const VerifyEmailPage(),
+      AuthStatus.initial || AuthStatus.loading =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
       _ => const LoginPage(),
     };
   }
@@ -84,15 +82,16 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   Future<void> _checkAuth() async {
-    // Animasi splash singkat
-    await Future.delayed(const Duration(seconds: 2));
-    if (!mounted) return;
+  // Animasi splash singkat
+  await Future.delayed(const Duration(seconds: 2));
+  if (!mounted) return;
 
-    final token = await SecureStorageService.getToken();
-    if (!mounted) return;
-    final route = token != null ? AppRouter.dashboard : AppRouter.login;
-    Navigator.pushReplacementNamed(context, route);
-  }
+  final success = await context.read<AuthProvider>().tryAutoLogin();
+  if (!mounted) return;
+
+  final route = success ? AppRouter.dashboard : AppRouter.login;
+  Navigator.pushReplacementNamed(context, route);
+}
 
   @override
   Widget build(BuildContext context) => const Scaffold(

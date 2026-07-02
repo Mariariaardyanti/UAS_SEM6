@@ -2,6 +2,8 @@ class ApiConstants {
   // Ganti dengan URL backend kamu
   static const String baseUrl = 'http://192.168.1.2:8081/v1';
   
+  // Base URL backend Dompet Kampus Global (be-emoney) — untuk setup TOTP
+  static const String emoneyBaseUrl = 'http://192.168.1.2:8080/v1';
   static void debug() {
     print("================================");
     print("BASE URL = $baseUrl");
