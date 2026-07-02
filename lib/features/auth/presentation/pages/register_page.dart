@@ -16,6 +16,9 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  // Aksen oren dipakai konsisten untuk icon & link di halaman ini.
+  static const Color _accentOrange = Color(0xFFFF7A29);
+
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
@@ -73,7 +76,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 children: [
                   const SizedBox(height: 32),
                   const AuthHeader(
-                    icon: Icons.person_add_alt_1,
+                    icon: Icons.storefront_rounded,
                     title: 'Buat Akun Baru',
                     subtitle: 'Lengkapi data diri Anda untuk mendaftar',
                   ),
@@ -82,7 +85,10 @@ class _RegisterPageState extends State<RegisterPage> {
                     label: 'Nama Lengkap',
                     hint: 'Masukkan nama lengkap',
                     controller: _nameCtrl,
-                    prefixIcon: const Icon(Icons.person_outline),
+                    prefixIcon: const Icon(
+                      Icons.person_outline_rounded,
+                      color: _accentOrange,
+                    ),
                     validator: (v) =>
                         (v?.isEmpty ?? true) ? 'Nama wajib diisi' : null,
                   ),
@@ -92,7 +98,10 @@ class _RegisterPageState extends State<RegisterPage> {
                     hint: 'contoh@email.com',
                     controller: _emailCtrl,
                     keyboardType: TextInputType.emailAddress,
-                    prefixIcon: const Icon(Icons.email_outlined),
+                    prefixIcon: const Icon(
+                      Icons.mail_outline_rounded,
+                      color: _accentOrange,
+                    ),
                     validator: (v) {
                       if (v?.isEmpty ?? true) return 'Email wajib diisi';
                       if (!EmailValidator.validate(v!)) {
@@ -107,10 +116,16 @@ class _RegisterPageState extends State<RegisterPage> {
                     hint: 'Minimal 8 karakter',
                     controller: _passCtrl,
                     obscureText: !_showPass,
-                    prefixIcon: const Icon(Icons.lock_outline),
+                    prefixIcon: const Icon(
+                      Icons.lock_outline_rounded,
+                      color: _accentOrange,
+                    ),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        _showPass ? Icons.visibility_off : Icons.visibility,
+                        _showPass
+                            ? Icons.visibility_off_rounded
+                            : Icons.visibility_rounded,
+                        color: _accentOrange,
                       ),
                       onPressed: () =>
                           setState(() => _showPass = !_showPass),
@@ -125,7 +140,10 @@ class _RegisterPageState extends State<RegisterPage> {
                     hint: 'Ulangi password',
                     controller: _pass2Ctrl,
                     obscureText: !_showPass,
-                    prefixIcon: const Icon(Icons.lock_outline),
+                    prefixIcon: const Icon(
+                      Icons.lock_outline_rounded,
+                      color: _accentOrange,
+                    ),
                     validator: (v) =>
                         v != _passCtrl.text ? 'Password tidak cocok' : null,
                   ),
@@ -148,7 +166,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         child: const Text(
                           'Masuk',
                           style: TextStyle(
-                            color: Color(0xFF1565C0),
+                            color: _accentOrange,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
