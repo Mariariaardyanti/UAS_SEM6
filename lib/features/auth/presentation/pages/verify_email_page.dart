@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pasar_malam/core/routes/app_router.dart';
+import 'package:pasar_malam/core/constants/app_colors.dart';
 import 'package:pasar_malam/features/auth/presentation/providers/auth_provider.dart';
 import 'package:pasar_malam/features/auth/presentation/widgets/auth_header.dart';
 import 'package:pasar_malam/features/auth/presentation/widgets/custom_button.dart';
@@ -106,11 +107,11 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const AuthHeader(
-                  icon: Icons.mark_email_unread_outlined,
+                  icon: Icons.mark_email_unread_rounded,
                   title: 'Verifikasi Email',
                   subtitle:
                       'Kami sudah mengirim link verifikasi ke email di bawah ini. Buka email dan klik link tersebut.',
-                  iconColor: Colors.orange,
+                  iconColor: AppColors.primary,
                 ),
                 const SizedBox(height: 24),
 
@@ -128,7 +129,8 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.email_outlined, color: Colors.grey),
+                      const Icon(Icons.mail_outline_rounded,
+                          color: Colors.grey),
                       const SizedBox(width: 12),
                       Text(
                         user?.email ?? '-',
@@ -158,7 +160,7 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
                   label: 'Ya, sudah konfirmasi',
                   onPressed: _onYes,
                   isLoading: auth.isLoading,
-                  icon: const Icon(Icons.check_circle_outline,
+                  icon: const Icon(Icons.check_circle_rounded,
                       color: Colors.white),
                 ),
                 const SizedBox(height: 12),
@@ -168,8 +170,8 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
                   label: 'Belum, kembali ke Login',
                   variant: ButtonVariant.outlined,
                   onPressed: _onNo,
-                  icon: const Icon(Icons.arrow_back,
-                      color: Color(0xFF1565C0)),
+                  icon: const Icon(Icons.arrow_back_rounded,
+                      color: AppColors.primary),
                 ),
                 const SizedBox(height: 32),
 
@@ -185,11 +187,13 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
                 const SizedBox(height: 8),
                 TextButton.icon(
                   onPressed: _resendCooldown ? null : _resendEmail,
-                  icon: const Icon(Icons.refresh, size: 18),
+                  icon: const Icon(Icons.refresh_rounded,
+                      size: 18, color: AppColors.primary),
                   label: Text(
                     _resendCooldown
                         ? 'Kirim Ulang ($_countdown detik)'
                         : 'Kirim Ulang Email',
+                    style: const TextStyle(color: AppColors.primary),
                   ),
                 ),
               ],
