@@ -11,9 +11,10 @@ import 'package:pasar_malam/features/auth/presentation/providers/auth_provider.d
 import 'package:pasar_malam/features/cart/presentation/providers/cart_provider.dart';
 import 'package:pasar_malam/features/dashboard/presentation/providers/product_provider.dart';
 import 'package:pasar_malam/features/order/presentation/providers/order_provider.dart';
+import 'package:pasar_malam/features/favorite/presentation/providers/favorite_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:pasar_malam/core/constants/api_constants.dart';
 
+import 'package:pasar_malam/core/constants/api_constants.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -23,8 +24,10 @@ void main() async {
   print("BASE URL = ${ApiConstants.baseUrl}");
   print("===============");
 
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await NotificationService.initialize();
   await GlobalInstitutePayService().init();
 
@@ -36,9 +39,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
-        ChangeNotifierProvider(
-          create: (_) => BiometricLockProvider()..initialize(),
-        ),
+        ChangeNotifierProvider(create: (_) => BiometricLockProvider()),
+        ChangeNotifierProvider(create: (_) => FavoriteProvider()),
       ],
       child: const MyApp(),
     ),
@@ -51,6 +53,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = context.watch<ThemeProvider>();
+
     return MaterialApp(
       title: 'Pasar Malam',
       debugShowCheckedModeBanner: false,

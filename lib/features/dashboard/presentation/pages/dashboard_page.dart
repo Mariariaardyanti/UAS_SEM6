@@ -7,6 +7,7 @@ import 'package:pasar_malam/features/dashboard/presentation/providers/product_pr
 import 'package:pasar_malam/features/order/presentation/providers/order_provider.dart';
 import 'package:pasar_malam/features/profile/presentation/pages/profile_page.dart';
 import 'package:provider/provider.dart';
+import 'package:pasar_malam/features/favorite/presentation/providers/favorite_provider.dart';
 import 'package:pasar_malam/features/favorite/presentation/pages/favorite_page.dart';
 
 // ── Palet oren gemas, otomatis nyesuain terang/gelap ───────
@@ -109,6 +110,7 @@ class _DashboardPageState extends State<DashboardPage> {
     final auth = context.watch<AuthProvider>();
     final productProv = context.watch<ProductProvider>();
     final cute = _Cute.of(context);
+    
 
     // ignore: unused_local_variable
     final _ = context.watch<OrderProvider>();
@@ -364,7 +366,6 @@ class _SearchBar extends StatelessWidget {
 }
 
 // ── Banner Card Widget ─────────────────────────────────────
-// ── Banner Card Widget ─────────────────────────────────────
 class _BannerCard extends StatelessWidget {
   const _BannerCard({super.key});
 
@@ -374,7 +375,7 @@ class _BannerCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(24),
       child: SizedBox(
         height: 200,
-        width: double.infinity,
+        width: 200,
         child: Image.network(
           "https://i.ibb.co.com/HDDrPZQW/82bc395f-954b-4c0f-a201-d934ac4a42da.png", 
           loadingBuilder: (context, child, loadingProgress) {
@@ -474,7 +475,7 @@ class _ProductCard extends StatefulWidget {
 }
 
 class _ProductCardState extends State<_ProductCard> {
-  bool _isFavorite = false;
+  
 
   void _showProductDetail(BuildContext context) {
     showModalBottomSheet(
@@ -494,6 +495,8 @@ class _ProductCardState extends State<_ProductCard> {
   Widget build(BuildContext context) {
     final p = widget.product;
     final cute = _Cute.of(context);
+    final favProv = context.watch<FavoriteProvider>();
+final isFav = favProv.isFavorite(p.id);
 
     return GestureDetector(
       onTap: () => _showProductDetail(context),
@@ -533,31 +536,43 @@ class _ProductCardState extends State<_ProductCard> {
                         : _imagePlaceholder(cute),
                   ),
                   // Heart button
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: GestureDetector(
-                      onTap: () => setState(() => _isFavorite = !_isFavorite),
-                      child: Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: BoxDecoration(
-                          color: cute.surface,
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.15),
-                              blurRadius: 4,
-                            ),
-                          ],
-                        ),
-                        child: Icon(
-                          _isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                          size: 16,
-                          color: _isFavorite ? cute.orangeDeep : cute.textHint,
-                        ),
-                      ),
-                    ),
-                  ),
+                  // Heart button
+Positioned(
+  top: 8,
+  right: 8,
+  child: Consumer<FavoriteProvider>(
+    builder: (context, favProv, _) {
+
+      final isFav = favProv.isFavorite(p.id); // HARUS dari provider
+
+      return GestureDetector(
+        onTap: () {
+          favProv.toggle(p); // kirim FULL PRODUCT
+        },
+        child: Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: cute.surface,
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.15),
+                blurRadius: 4,
+              ),
+            ],
+          ),
+          child: Icon(
+            isFav
+                ? Icons.favorite_rounded
+                : Icons.favorite_border_rounded,
+            size: 16,
+            color: isFav ? Colors.red : cute.textHint,
+          ),
+        ),
+      );
+    },
+  ),
+),
                 ],
               ),
             ),

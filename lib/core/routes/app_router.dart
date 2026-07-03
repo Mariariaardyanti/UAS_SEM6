@@ -28,7 +28,7 @@ class AppRouter {
   static const String myOrders = '/my-orders';
   static const String paymentPending = '/payment-pending';
   static const String profile = '/profile';
-  static const favorite = '/favorite';
+  static const String favorite = '/favorite';
   
 
   static Map<String, WidgetBuilder> get routes => {
@@ -40,7 +40,8 @@ class AppRouter {
         cart: (_) => const CartPage(),
         checkout: (_) => const CheckoutPage(),
         myOrders: (_) => const MyOrdersPage(),
-        
+         profile: (_) => const ProfilePage(), 
+  favorite: (_) => const FavoritePage(),
         orderSuccess: (context) {
           final order =
               ModalRoute.of(context)!.settings.arguments as OrderModel;

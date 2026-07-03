@@ -121,7 +121,7 @@ class ProfilePage extends StatelessWidget {
                   const SizedBox(height: 10),
                   _MenuCard(
                     icon: Icons.favorite_border_rounded,
-                    label: 'Wishlist',
+                    label: 'Favorite',
                     leaf: leaf,
                     onTap: () {
                       // TODO: sambungkan ke route wishlist saat tersedia
