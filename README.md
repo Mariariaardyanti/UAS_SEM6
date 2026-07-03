@@ -13,9 +13,21 @@
 Untuk meningkatkan keamanan setiap transaksi, MOO Wallet dilengkapi dengan fitur Autentikasi Dua Langkah (2FA) menggunakan Google Authenticator (TOTP). Selain itu, aplikasi ini juga mendukung integrasi Deep Link, sehingga proses pembayaran dari aplikasi e-commerce dapat dilakukan secara langsung tanpa perlu berpindah aplikasi secara manual, memberikan pengalaman transaksi yang lebih nyaman dan efisien.
 
 
-## 📱 Dompet Digital
+## 📱 Bag Store
 *BagStore* adalah aplikasi e-commerce yang dirancang untuk memudahkan pengguna dalam berbelanja berbagai koleksi tas secara online dengan tampilan antarmuka yang modern, menarik, dan mudah digunakan. Aplikasi ini memungkinkan pengguna untuk menjelajahi katalog produk, melihat detail tas, menambahkan produk ke keranjang, mengelola pesanan, hingga melakukan pembayaran dengan proses yang cepat dan praktis.
 
 Aplikasi ini telah terintegrasi dengan MUU Wallet melalui fitur *Deep Link Payment*, sehingga pengguna dapat melakukan pembayaran secara langsung menggunakan dompet digital tanpa harus memasukkan data pembayaran secara manual. Dengan desain UI yang responsif dan pengalaman pengguna yang intuitif, BagStore memberikan proses berbelanja yang lebih mudah, aman, dan nyaman.
 
 ---
+
+## 🔗 Project Terkait
+
+Berikut merupakan repository yang saling terhubung dalam pengembangan sistem, mulai dari backend hingga aplikasi mobile.
+
+| **Project**             | **Repository GitHub**                                      |
+| ----------------------- | ---------------------------------------------------------- |
+| Backend E-Commerce Tas  | https://github.com/Mariariaardyanti/mycatalog-be.git |
+| Aplikasi E-Commerce Tas | https://github.com/Mariariaardyanti/Toko_Tas.git  |
+| Backend MOO Wallet      | https://github.com/Mariariaardyanti/be-emoney.git      |
+| Aplikasi MOO Wallet     | https://github.com/Mariariaardyanti/dompet_digital.git   |
+
