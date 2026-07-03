@@ -4,6 +4,7 @@ import 'package:pasar_malam/core/routes/app_router.dart';
 import 'package:pasar_malam/features/auth/presentation/providers/auth_provider.dart';
 import 'package:pasar_malam/features/cart/presentation/providers/cart_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:pasar_malam/features/favorite/presentation/pages/favorite_page.dart';
 
 // ── Palet hijau, otomatis nyesuain terang/gelap ────────────
 // (mengikuti pola _Cute di DashboardPage, warna diganti hijau
@@ -20,8 +21,10 @@ class _Leaf {
 
   Color get surface => isDark ? const Color(0xFF2C2C2C) : Colors.white;
   // Border
-  Color get border =>
-    isDark ? const Color(0xFF4A3826) : const Color(0xFFFFE8D6);
+  Color get border => isDark
+      ? const Color(0xFF4A3826)
+      : const Color(0xFFFFE8D6);
+
   // Text
   Color get textPrimary =>
       isDark ? const Color(0xFFEEEEEE) : const Color(0xFF3B2A20);
@@ -362,6 +365,13 @@ class _ProfileBottomNav extends StatelessWidget {
                     Navigator.pop(context);
                   } else if (i == 1) {
                     Navigator.pushNamed(context, AppRouter.cart);
+                  } else if (i == 2) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const FavoritePage(),
+                      ),
+                    );
                   }
                 },
                 child: Padding(

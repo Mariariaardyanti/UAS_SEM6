@@ -7,6 +7,7 @@ import 'package:pasar_malam/features/dashboard/presentation/providers/product_pr
 import 'package:pasar_malam/features/order/presentation/providers/order_provider.dart';
 import 'package:pasar_malam/features/profile/presentation/pages/profile_page.dart';
 import 'package:provider/provider.dart';
+import 'package:pasar_malam/features/favorite/presentation/pages/favorite_page.dart';
 
 // ── Palet oren gemas, otomatis nyesuain terang/gelap ───────
 class _Cute {
@@ -284,26 +285,36 @@ class _DashboardPageState extends State<DashboardPage> {
 
             // ── Bottom Navigation Bar ────────────────────
             _BottomNav(
-              selectedIndex: _selectedNav,
-              onTap: (i) {
-                if (i == 1) {
-                  // Cart → navigate to CartPage
-                  Navigator.pushNamed(context, AppRouter.cart).then((_) {
-                    if (context.mounted) {
-                      context.read<CartProvider>().fetchCart();
-                    }
-                  });
-                } else if (i == 3) {
-                  // Account → buka ProfilePage (bukan dialog lagi)
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const ProfilePage()),
-                  );
-                } else {
-                  setState(() => _selectedNav = i);
-                }
-              },
-            ),
+            selectedIndex: _selectedNav,
+            onTap: (i) {
+              if (i == 1) {
+                // Cart
+                Navigator.pushNamed(context, AppRouter.cart).then((_) {
+                  if (context.mounted) {
+                    context.read<CartProvider>().fetchCart();
+                  }
+                });
+              } else if (i == 2) {
+                // Favorite
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const FavoritePage(),
+                  ),
+                );
+              } else if (i == 3) {
+                // Profile
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ProfilePage(),
+                  ),
+                );
+              } else {
+                setState(() => _selectedNav = i);
+              }
+            },
+          ),
           ],
         ),
       ),

@@ -11,7 +11,10 @@ import 'package:pasar_malam/features/order/presentation/pages/my_orders_page.dar
 import 'package:pasar_malam/features/order/presentation/pages/order_success_page.dart';
 import 'package:pasar_malam/features/order/presentation/pages/payment_pending_page.dart';
 import 'package:pasar_malam/features/profile/presentation/pages/profile_page.dart';
+import 'package:pasar_malam/features/favorite/presentation/pages/favorite_page.dart';
+
 import 'package:provider/provider.dart';
+
 
 class AppRouter {
   static const String splash = '/';
@@ -25,6 +28,7 @@ class AppRouter {
   static const String myOrders = '/my-orders';
   static const String paymentPending = '/payment-pending';
   static const String profile = '/profile';
+  static const favorite = '/favorite';
   
 
   static Map<String, WidgetBuilder> get routes => {
