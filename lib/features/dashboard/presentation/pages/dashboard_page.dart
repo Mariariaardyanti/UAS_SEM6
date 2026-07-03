@@ -76,7 +76,7 @@ class _DashboardPageState extends State<DashboardPage> {
   static const String _storeLogoUrl =
       'https://i.ibb.co.com/0VWk0BDJ/36581ebf-d1b2-4e22-8d18-b6b19368c6f3-removebg-preview.png';
   static const String _bannerUrl =
-      'https://i.ibb.co.com/HDDrPZQW/82bc395f-954b-4c0f-a201-d934ac4a42da.png';
+      'https://i.ibb.co.com/b5CdDbdN/82bc395f-954b-4c0f-a201-d934ac4a42da-removebg-preview.png';
 
   final List<_CategoryItem> _categories = const [
     _CategoryItem(label: 'All', icon: Icons.apps_rounded),
@@ -173,7 +173,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                     const SliverToBoxAdapter(
                       child: Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        padding: EdgeInsets.symmetric(horizontal: 25),
                         child: _BannerCard(imageUrl: _bannerUrl),
                       ),
                     ),
@@ -248,7 +248,10 @@ class _DashboardPageState extends State<DashboardPage> {
                               ),
                               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                                 crossAxisCount: 2,
-                                childAspectRatio: 0.62,
+                                // Angka ini yang ngatur tinggi kartu produk.
+                                // Makin besar nilainya, kartu makin pendek.
+                                // 0.62 (lama) → 0.75 (baru) biar nggak kepanjangan.
+                                childAspectRatio: 1,
                                 crossAxisSpacing: 12,
                                 mainAxisSpacing: 12,
                               ),

@@ -9,6 +9,8 @@ class CustomButton extends StatelessWidget {
   final ButtonVariant variant;
   final Widget? icon;
 
+  static const Color _primaryColor = Color(0xFFFF7A29);
+
   const CustomButton({
     super.key,
     required this.label,
@@ -32,7 +34,10 @@ class CustomButton extends StatelessWidget {
         : Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (icon != null) ...[icon!, const SizedBox(width: 8)],
+              if (icon != null) ...[
+                icon!,
+                const SizedBox(width: 8),
+              ],
               Text(
                 label,
                 style: const TextStyle(
@@ -48,31 +53,40 @@ class CustomButton extends StatelessWidget {
       height: 52,
       child: switch (variant) {
         ButtonVariant.primary => ElevatedButton(
-          onPressed: isLoading ? null : onPressed,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF1565C0),
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+            onPressed: isLoading ? null : onPressed,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _primaryColor,
+              foregroundColor: Colors.white,
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
             ),
-            elevation: 2,
+            child: child,
           ),
-          child: child,
-        ),
+
         ButtonVariant.outlined => OutlinedButton(
-          onPressed: isLoading ? null : onPressed,
-          style: OutlinedButton.styleFrom(
-            side: const BorderSide(color: Color(0xFF1565C0), width: 1.5),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+            onPressed: isLoading ? null : onPressed,
+            style: OutlinedButton.styleFrom(
+              foregroundColor: _primaryColor,
+              side: const BorderSide(
+                color: _primaryColor,
+                width: 1.5,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
             ),
+            child: child,
           ),
-          child: child,
-        ),
+
         ButtonVariant.text => TextButton(
-          onPressed: isLoading ? null : onPressed,
-          child: child,
-        ),
+            onPressed: isLoading ? null : onPressed,
+            style: TextButton.styleFrom(
+              foregroundColor: _primaryColor,
+            ),
+            child: child,
+          ),
       },
     );
   }
