@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:pasar_malam/core/providers/theme_provider.dart';
 import 'package:pasar_malam/core/routes/app_router.dart';
 import 'package:pasar_malam/features/auth/presentation/providers/auth_provider.dart';
 import 'package:pasar_malam/features/cart/presentation/providers/cart_provider.dart';
 import 'package:pasar_malam/features/dashboard/data/models/product_model.dart';
 import 'package:pasar_malam/features/dashboard/presentation/providers/product_provider.dart';
 import 'package:pasar_malam/features/order/presentation/providers/order_provider.dart';
+import 'package:pasar_malam/features/profile/presentation/pages/profile_page.dart';
 import 'package:provider/provider.dart';
 
 // ── Palet oren gemas, otomatis nyesuain terang/gelap ───────
@@ -294,8 +294,11 @@ class _DashboardPageState extends State<DashboardPage> {
                     }
                   });
                 } else if (i == 3) {
-                  // Account → logout dialog
-                  _showLogoutDialog(context, auth);
+                  // Account → buka ProfilePage (bukan dialog lagi)
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ProfilePage()),
+                  );
                 } else {
                   setState(() => _selectedNav = i);
                 }
@@ -304,15 +307,6 @@ class _DashboardPageState extends State<DashboardPage> {
           ],
         ),
       ),
-    );
-  }
-
-  void _showLogoutDialog(BuildContext context, AuthProvider auth) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) {
-        return _AccountDialog(auth: auth);
-      },
     );
   }
 }
@@ -1084,106 +1078,4 @@ class _NavItem {
   final IconData icon;
   final String label;
   const _NavItem({required this.icon, required this.label});
-}
-
-// ── Account Dialog (dengan Dark Mode Switch) ──────────────
-class _AccountDialog extends StatelessWidget {
-  final AuthProvider auth;
-
-  const _AccountDialog({required this.auth});
-
-  @override
-  Widget build(BuildContext context) {
-    final themeProvider = context.watch<ThemeProvider>();
-    final isDark = themeProvider.isDark;
-    final cute = _Cute.of(context);
-
-    return AlertDialog(
-      backgroundColor: cute.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-      title: Text(
-        'Akun',
-        style: TextStyle(fontWeight: FontWeight.w800, color: cute.textPrimary),
-      ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Avatar
-          CircleAvatar(
-            radius: 30,
-            backgroundColor: cute.orange,
-            child: Text(
-              (auth.firebaseUser?.displayName ?? 'U')[0].toUpperCase(),
-              style: const TextStyle(fontSize: 24, color: Colors.white),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            auth.firebaseUser?.displayName ?? 'User',
-            style: TextStyle(
-              fontWeight: FontWeight.w800,
-              fontSize: 16,
-              color: cute.textPrimary,
-            ),
-          ),
-          Text(
-            auth.firebaseUser?.email ?? '',
-            style: TextStyle(color: cute.textSecondary, fontSize: 13),
-          ),
-          const SizedBox(height: 20),
-          Divider(color: cute.border),
-          const SizedBox(height: 4),
-
-          // Dark mode toggle row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Icon(
-                    isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
-                    size: 20,
-                    color: isDark ? cute.yellowAccent : Colors.grey.shade600,
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    isDark ? 'Mode Gelap' : 'Mode Terang',
-                    style: TextStyle(fontSize: 14, color: cute.textPrimary),
-                  ),
-                ],
-              ),
-              Switch(
-                value: isDark,
-                activeColor: cute.orange,
-                onChanged: (_) => context.read<ThemeProvider>().toggle(),
-              ),
-            ],
-          ),
-        ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          style: TextButton.styleFrom(foregroundColor: cute.orangeDeep),
-          child: const Text('Tutup'),
-        ),
-        ElevatedButton.icon(
-          icon: const Icon(Icons.logout_rounded, size: 18),
-          label: const Text('Logout'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.redAccent,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          ),
-          onPressed: () async {
-            Navigator.pop(context);
-            await auth.logout();
-            if (!context.mounted) return;
-            // ignore: use_build_context_synchronously
-            Navigator.pushReplacementNamed(context, AppRouter.login);
-          },
-        ),
-      ],
-    );
-  }
 }
