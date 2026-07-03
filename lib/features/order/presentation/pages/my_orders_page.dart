@@ -3,6 +3,11 @@ import 'package:pasar_malam/features/order/data/models/order_model.dart';
 import 'package:pasar_malam/features/order/presentation/providers/order_provider.dart';
 import 'package:provider/provider.dart';
 
+// ── Orange theme accents (UI only) ─────────────────────────
+const Color _kOrangePrimary = Color(0xFFFF7A00);
+const Color _kOrangeDark = Color(0xFFE65100);
+const Color _kBg = Color(0xFFFAFAFA);
+
 class MyOrdersPage extends StatefulWidget {
   const MyOrdersPage({super.key});
 
@@ -48,11 +53,22 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Pesanan Saya')),
+      backgroundColor: _kBg,
+      appBar: AppBar(
+        title: const Text(
+          'Pesanan Saya',
+          style: TextStyle(fontWeight: FontWeight.w700, color: Colors.white),
+        ),
+        backgroundColor: _kOrangePrimary,
+        foregroundColor: Colors.white,
+        elevation: 0,
+      ),
       body: Consumer<OrderProvider>(
         builder: (context, orderProv, _) {
           if (orderProv.checkoutStatus == OrderStatus.loading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(color: _kOrangePrimary),
+            );
           }
 
           if (orderProv.checkoutStatus == OrderStatus.error) {
@@ -67,6 +83,14 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
                   ElevatedButton.icon(
                     icon: const Icon(Icons.refresh),
                     label: const Text('Coba Lagi'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _kOrangePrimary,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
                     onPressed: () => orderProv.fetchMyOrders(),
                   ),
                 ],
@@ -82,10 +106,7 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
                   Icon(
                     Icons.receipt_long_outlined,
                     size: 72,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.3),
+                    color: _kOrangePrimary.withValues(alpha: 0.25),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -103,6 +124,7 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
           }
 
           return RefreshIndicator(
+            color: _kOrangePrimary,
             onRefresh: () => orderProv.fetchMyOrders(),
             child: ListView.separated(
               padding: const EdgeInsets.all(16),
@@ -169,20 +191,19 @@ class _OrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final surface = Theme.of(context).colorScheme.surface;
     final onSurface = Theme.of(context).colorScheme.onSurface;
-    final primary = Theme.of(context).colorScheme.primary;
     final statusColor = _statusColor(order.status);
 
     return Container(
       decoration: BoxDecoration(
-        color: surface,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFF0F0F0)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: _kOrangePrimary.withValues(alpha: 0.06),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -197,10 +218,10 @@ class _OrderCard extends StatelessWidget {
               children: [
                 Text(
                   'Order #${order.id}',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: primary,
+                    color: _kOrangeDark,
                   ),
                 ),
                 Container(
@@ -232,7 +253,7 @@ class _OrderCard extends StatelessWidget {
                 color: onSurface.withValues(alpha: 0.5),
               ),
             ),
-            const Divider(height: 20),
+            const Divider(height: 20, color: Color(0xFFF0F0F0)),
             // Jumlah item + total
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -246,10 +267,10 @@ class _OrderCard extends StatelessWidget {
                 ),
                 Text(
                   formatPrice(order.totalAmount),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
-                    color: onSurface,
+                    color: _kOrangePrimary,
                   ),
                 ),
               ],
