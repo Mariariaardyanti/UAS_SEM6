@@ -11,6 +11,11 @@ import 'package:url_launcher/url_launcher.dart';
 
 void _log(String msg) => debugPrint('[PasarMalam/PaymentPending] $msg');
 
+// ── Orange theme accents (UI only) ─────────────────────────
+const Color _kOrangePrimary = Color(0xFFFF7A00);
+const Color _kOrangeDark = Color(0xFFE65100);
+const Color _kBg = Color(0xFFFAFAFA);
+
 class PaymentPendingPage extends StatefulWidget {
   final OrderModel order;
 
@@ -217,14 +222,20 @@ class _PaymentPendingPageState extends State<PaymentPendingPage>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Mengerti'),
+            child: const Text(
+              'Mengerti',
+              style: TextStyle(color: _kOrangePrimary),
+            ),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
               context.read<OrderProvider>().checkPaymentStatus(widget.order.id);
             },
-            child: const Text('Cek Status Sekarang'),
+            child: const Text(
+              'Cek Status Sekarang',
+              style: TextStyle(color: _kOrangePrimary),
+            ),
           ),
         ],
       ),
@@ -249,8 +260,15 @@ class _PaymentPendingPageState extends State<PaymentPendingPage>
         if (!didPop) _showCancelConfirmation();
       },
       child: Scaffold(
+        backgroundColor: _kBg,
         appBar: AppBar(
-          title: const Text('Selesaikan Pembayaran'),
+          title: const Text(
+            'Selesaikan Pembayaran',
+            style: TextStyle(fontWeight: FontWeight.w700, color: Colors.white),
+          ),
+          backgroundColor: _kOrangePrimary,
+          foregroundColor: Colors.white,
+          elevation: 0,
           leading: IconButton(
             icon: const Icon(Icons.close),
             onPressed: _showCancelConfirmation,
@@ -288,7 +306,10 @@ class _PaymentPendingPageState extends State<PaymentPendingPage>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Lanjutkan Bayar'),
+            child: const Text(
+              'Lanjutkan Bayar',
+              style: TextStyle(color: _kOrangePrimary),
+            ),
           ),
           TextButton(
             onPressed: () {
@@ -338,8 +359,6 @@ class _VirtualAccountBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final primary = Theme.of(context).colorScheme.primary;
-    final surface = Theme.of(context).colorScheme.surface;
     final onSurface = Theme.of(context).colorScheme.onSurface;
     final vaNumber = order.vaNumber ?? '-';
 
@@ -353,13 +372,13 @@ class _VirtualAccountBody extends StatelessWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: const Color(0xFFE65100).withValues(alpha: 0.1),
+                color: _kOrangeDark.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.credit_card,
                 size: 40,
-                color: Color(0xFFE65100),
+                color: _kOrangeDark,
               ),
             ),
           ),
@@ -378,8 +397,8 @@ class _VirtualAccountBody extends StatelessWidget {
           Center(
             child: Text(
               'Order #${order.id} · ${formatPrice(order.totalAmount)}',
-              style: TextStyle(
-                color: primary,
+              style: const TextStyle(
+                color: _kOrangePrimary,
                 fontWeight: FontWeight.w600,
                 fontSize: 14,
               ),
@@ -390,14 +409,14 @@ class _VirtualAccountBody extends StatelessWidget {
           const SizedBox(height: 8),
           Container(
             decoration: BoxDecoration(
-              color: surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: primary.withValues(alpha: 0.3)),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: _kOrangePrimary.withValues(alpha: 0.35)),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
+                  color: _kOrangePrimary.withValues(alpha: 0.06),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
                 ),
               ],
             ),
@@ -427,7 +446,7 @@ class _VirtualAccountBody extends StatelessWidget {
                   },
                   icon: const Icon(Icons.copy_rounded),
                   tooltip: 'Salin nomor VA',
-                  color: primary,
+                  color: _kOrangePrimary,
                 ),
               ],
             ),
@@ -436,7 +455,7 @@ class _VirtualAccountBody extends StatelessWidget {
           Container(
             width: double.infinity,
             decoration: BoxDecoration(
-              color: primary.withValues(alpha: 0.08),
+              color: _kOrangePrimary.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(12),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -449,10 +468,10 @@ class _VirtualAccountBody extends StatelessWidget {
                 ),
                 Text(
                   formatPrice(order.totalAmount),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: primary,
+                    color: _kOrangePrimary,
                   ),
                 ),
               ],
@@ -463,12 +482,13 @@ class _VirtualAccountBody extends StatelessWidget {
           const SizedBox(height: 10),
           Container(
             decoration: BoxDecoration(
-              color: surface,
-              borderRadius: BorderRadius.circular(12),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: const Color(0xFFF0F0F0)),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
-                  blurRadius: 6,
+                  color: _kOrangePrimary.withValues(alpha: 0.05),
+                  blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
               ],
@@ -477,7 +497,8 @@ class _VirtualAccountBody extends StatelessWidget {
               children: [
                 for (int i = 0; i < _banks.length; i++) ...[
                   _BankStepTile(bank: _banks[i], vaNumber: vaNumber),
-                  if (i < _banks.length - 1) const Divider(height: 1),
+                  if (i < _banks.length - 1)
+                    const Divider(height: 1, color: Color(0xFFF0F0F0)),
                 ],
               ],
             ),
@@ -579,12 +600,10 @@ class _GlobalInstitutePayBody extends StatelessWidget {
     required this.onCheckStatus,
   });
 
-  static const _brandColor = Color(0xFF1A237E);
+  static const _brandColor = _kOrangeDark;
 
   @override
   Widget build(BuildContext context) {
-    final primary = Theme.of(context).colorScheme.primary;
-    final surface = Theme.of(context).colorScheme.surface;
     final onSurface = Theme.of(context).colorScheme.onSurface;
 
     return SingleChildScrollView(
@@ -595,8 +614,8 @@ class _GlobalInstitutePayBody extends StatelessWidget {
           Container(
             width: 90,
             height: 90,
-            decoration: const BoxDecoration(
-              color: Color(0x1A1A237E),
+            decoration: BoxDecoration(
+              color: _brandColor.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: const Icon(
@@ -617,8 +636,8 @@ class _GlobalInstitutePayBody extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             'Order #${order.id} · ${formatPrice(order.totalAmount)}',
-            style: TextStyle(
-              color: primary,
+            style: const TextStyle(
+              color: _kOrangePrimary,
               fontWeight: FontWeight.w600,
               fontSize: 14,
             ),
@@ -655,13 +674,14 @@ class _GlobalInstitutePayBody extends StatelessWidget {
           Container(
             width: double.infinity,
             decoration: BoxDecoration(
-              color: surface,
+              color: Colors.white,
               borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFF0F0F0)),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.06),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
+                  color: _kOrangePrimary.withValues(alpha: 0.06),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
                 ),
               ],
             ),
@@ -698,11 +718,12 @@ class _GlobalInstitutePayBody extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                backgroundColor: _brandColor,
+                backgroundColor: _kOrangePrimary,
                 foregroundColor: Colors.white,
+                elevation: 0,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(14),
                 ),
               ),
               icon: const Icon(Icons.open_in_new),
@@ -764,17 +785,17 @@ class _StepItem extends StatelessWidget {
             shape: BoxShape.circle,
             color: done
                 ? Colors.green
-                : Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
+                : _kOrangePrimary.withValues(alpha: 0.12),
           ),
           child: Center(
             child: done
                 ? const Icon(Icons.check, size: 16, color: Colors.white)
                 : Text(
                     number,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.primary,
+                      color: _kOrangePrimary,
                     ),
                   ),
           ),
@@ -832,20 +853,18 @@ class _CheckStatusButton extends StatelessWidget {
         style: OutlinedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 14),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
           ),
-          side: BorderSide(
-            color: Theme.of(context).colorScheme.primary,
-          ),
-          foregroundColor: Theme.of(context).colorScheme.primary,
+          side: const BorderSide(color: _kOrangePrimary, width: 1.5),
+          foregroundColor: _kOrangePrimary,
         ),
         icon: isChecking
-            ? SizedBox(
+            ? const SizedBox(
                 width: 18,
                 height: 18,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: _kOrangePrimary,
                 ),
               )
             : const Icon(Icons.refresh_rounded),
