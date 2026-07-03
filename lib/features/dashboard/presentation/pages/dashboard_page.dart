@@ -10,7 +10,9 @@ import 'package:provider/provider.dart';
 import 'package:pasar_malam/features/favorite/presentation/providers/favorite_provider.dart';
 import 'package:pasar_malam/features/favorite/presentation/pages/favorite_page.dart';
 
-// Palet oren gemas, otomatis nyesuain terang/gelap
+// ── Design tokens ──────────────────────────────────────────────────────────
+// Palet oren gemas, otomatis nyesuain terang/gelap.
+// Semua ukuran spasi/radius dipusatkan di sini biar tampilan konsisten.
 class _Cute {
   final bool isDark;
   const _Cute(this.isDark);
@@ -21,7 +23,6 @@ class _Cute {
   // Latar
   Color get bg => isDark ? const Color(0xFF121212) : const Color(0xFFFFF7EF);
   Color get surface => isDark ? const Color(0xFF2C2C2C) : Colors.white;
-  Color get surfaceAlt => isDark ? const Color(0xFF1E1E1E) : Colors.white;
 
   // Aksen lembut (badge, border kartu, dsb)
   Color get peach => isDark ? const Color(0xFF3A2A1E) : const Color(0xFFFFE8D6);
@@ -34,14 +35,24 @@ class _Cute {
 
   // Oren utama — tetap konsisten di dua mode biar brand-nya kebaca
   Color get orange => const Color(0xFFFF7A29);
-  Color get orangeSoft => const Color(0xFFFFA351);
-  // Sedikit dicerahkan di dark biar kontras enak di atas latar gelap
   Color get orangeDeep => isDark ? const Color(0xFFFFA35C) : const Color(0xFFE85D04);
   Color get yellowAccent => const Color(0xFFFFC15E);
 
   Color get shadow => isDark
       ? Colors.black.withValues(alpha: 0.35)
       : const Color(0xFFFF7A29).withValues(alpha: 0.10);
+
+  // Radius & spacing baku
+  static const double radiusSm = 14;
+  static const double radiusMd = 20;
+  static const double radiusLg = 28;
+  static const double gapSm = 8;
+  static const double gapMd = 16;
+  static const double gapLg = 24;
+
+  List<BoxShadow> get cardShadow => [
+        BoxShadow(color: shadow, blurRadius: 10, offset: const Offset(0, 3)),
+      ];
 }
 
 class DashboardPage extends StatefulWidget {
@@ -56,11 +67,11 @@ class _DashboardPageState extends State<DashboardPage> {
   String _selectedCategory = 'All';
   final _searchCtrl = TextEditingController();
 
-  
   static const String _storeLogoUrl =
       'https://i.ibb.co.com/0VWk0BDJ/36581ebf-d1b2-4e22-8d18-b6b19368c6f3-removebg-preview.png';
+  static const String _bannerUrl =
+      'https://i.ibb.co.com/HDDrPZQW/82bc395f-954b-4c0f-a201-d934ac4a42da.png';
 
-  
   final List<_CategoryItem> _categories = const [
     _CategoryItem(label: 'All', icon: Icons.apps_rounded),
     _CategoryItem(label: 'Ransel', icon: Icons.backpack_rounded),
@@ -107,81 +118,56 @@ class _DashboardPageState extends State<DashboardPage> {
       buffer.write(str[i]);
       count++;
     }
-    return 'Rp. ${buffer.toString().split('').reversed.join()}';
+    return 'Rp ${buffer.toString().split('').reversed.join()}';
   }
 
   @override
   Widget build(BuildContext context) {
-    final auth = context.watch<AuthProvider>();
     final productProv = context.watch<ProductProvider>();
     final cute = _Cute.of(context);
-    
 
-    // ignore: unused_local_variable
-    final _ = context.watch<OrderProvider>();
+    // Memastikan OrderProvider ikut ter-watch tanpa dipakai langsung di sini.
+    context.watch<OrderProvider>();
 
     return Scaffold(
       backgroundColor: cute.bg,
       body: SafeArea(
         child: Column(
           children: [
-            // Body scroll
             Expanded(
               child: RefreshIndicator(
                 color: cute.orange,
                 onRefresh: () => productProv.fetchProducts(),
                 child: CustomScrollView(
                   slivers: [
-                    // Store Header (logo + nama toko + notifikasi dummy)
                     SliverToBoxAdapter(
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
                         child: _StoreHeader(logoUrl: _storeLogoUrl),
                       ),
                     ),
-
-                    // Search Bar
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-                        child: _SearchBar(controller: _searchCtrl, onChanged: (_) => setState(() {})),
+                        padding: const EdgeInsets.fromLTRB(16, _Cute.gapMd, 16, _Cute.gapSm + 4),
+                        child: _SearchBar(
+                          controller: _searchCtrl,
+                          onChanged: (_) => setState(() {}),
+                        ),
                       ),
                     ),
-
-                    // Banner
                     const SliverToBoxAdapter(
                       child: Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16),
-                        child: _BannerCard(),
+                        child: _BannerCard(imageUrl: _bannerUrl),
                       ),
                     ),
-
-                    // Categories
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Kategori',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w800,
-                                color: cute.textPrimary,
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () {},
-                              child: Text(
-                                'Lihat Semua',
-                                style: TextStyle(
-                                  color: cute.orangeDeep,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ),
-                          ],
+                        padding: const EdgeInsets.fromLTRB(16, _Cute.gapLg, 16, 0),
+                        child: _SectionHeader(
+                          title: 'Kategori',
+                          actionLabel: 'Lihat Semua',
+                          onAction: () {},
                         ),
                       ),
                     ),
@@ -195,21 +181,18 @@ class _DashboardPageState extends State<DashboardPage> {
                           separatorBuilder: (ctx, idx) => const SizedBox(width: 10),
                           itemBuilder: (_, i) {
                             final cat = _categories[i];
-                            final selected = _selectedCategory == cat.label;
                             return _CategoryChip(
                               item: cat,
-                              selected: selected,
+                              selected: _selectedCategory == cat.label,
                               onTap: () => setState(() => _selectedCategory = cat.label),
                             );
                           },
                         ),
                       ),
                     ),
-
-                    // For You label
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 24, 16, 12),
+                        padding: const EdgeInsets.fromLTRB(16, _Cute.gapLg, 16, 12),
                         child: Text(
                           'Buat Kamu',
                           style: TextStyle(
@@ -220,58 +203,22 @@ class _DashboardPageState extends State<DashboardPage> {
                         ),
                       ),
                     ),
-
-                    // Product Grid
                     switch (productProv.status) {
-                      ProductStatus.loading || ProductStatus.initial =>
-                        SliverFillRemaining(
+                      ProductStatus.loading || ProductStatus.initial => SliverFillRemaining(
                           child: Center(
                             child: CircularProgressIndicator(color: cute.orange),
                           ),
                         ),
                       ProductStatus.error => SliverFillRemaining(
-                          child: Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const SizedBox(height: 12),
-                                Text(
-                                  productProv.error ?? 'Aduh, ada yang salah nih',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    color: cute.textPrimary,
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: cute.orange,
-                                    foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 20, vertical: 12),
-                                  ),
-                                  icon: const Icon(Icons.refresh_rounded),
-                                  label: const Text('Coba Lagi'),
-                                  onPressed: () => productProv.fetchProducts(),
-                                ),
-                              ],
-                            ),
+                          child: _ErrorState(
+                            message: productProv.error ?? 'Aduh, ada yang salah nih',
+                            onRetry: () => productProv.fetchProducts(),
                           ),
                         ),
                       ProductStatus.loaded => () {
                           final items = _filteredProducts(productProv.products);
                           if (items.isEmpty) {
-                            return SliverFillRemaining(
-                              child: Center(
-                                child: Text(
-                                  '🔍 Produk tidak ditemukan',
-                                  style: TextStyle(color: cute.textPrimary),
-                                ),
-                              ),
-                            );
+                            return const SliverFillRemaining(child: _EmptyState());
                           }
                           return SliverPadding(
                             padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
@@ -297,39 +244,32 @@ class _DashboardPageState extends State<DashboardPage> {
                 ),
               ),
             ),
-
-            // Bottom Navigation Bar
             _BottomNav(
-            selectedIndex: _selectedNav,
-            onTap: (i) {
-              if (i == 1) {
-                // Cart
-                Navigator.pushNamed(context, AppRouter.cart).then((_) {
-                  if (context.mounted) {
-                    context.read<CartProvider>().fetchCart();
-                  }
-                });
-              } else if (i == 2) {
-                // Favorite
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const FavoritePage(),
-                  ),
-                );
-              } else if (i == 3) {
-                // Profile
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const ProfilePage(),
-                  ),
-                );
-              } else {
-                setState(() => _selectedNav = i);
-              }
-            },
-          ),
+              selectedIndex: _selectedNav,
+              onTap: (i) {
+                switch (i) {
+                  case 1:
+                    Navigator.pushNamed(context, AppRouter.cart).then((_) {
+                      if (context.mounted) context.read<CartProvider>().fetchCart();
+                    });
+                    break;
+                  case 2:
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const FavoritePage()),
+                    );
+                    break;
+                  case 3:
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const ProfilePage()),
+                    );
+                    break;
+                  default:
+                    setState(() => _selectedNav = i);
+                }
+              },
+            ),
           ],
         ),
       ),
@@ -337,7 +277,7 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 }
 
-
+// ── Store header ────────────────────────────────────────────────────────────
 class _StoreHeader extends StatelessWidget {
   final String logoUrl;
   const _StoreHeader({required this.logoUrl});
@@ -348,9 +288,8 @@ class _StoreHeader extends StatelessWidget {
 
     return Row(
       children: [
-        
         ClipRRect(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(_Cute.radiusSm),
           child: Image.network(
             logoUrl,
             width: 46,
@@ -362,10 +301,7 @@ class _StoreHeader extends StatelessWidget {
                 width: 46,
                 height: 46,
                 child: Center(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: cute.orange,
-                  ),
+                  child: CircularProgressIndicator(strokeWidth: 2, color: cute.orange),
                 ),
               );
             },
@@ -374,18 +310,13 @@ class _StoreHeader extends StatelessWidget {
               height: 46,
               decoration: BoxDecoration(
                 color: cute.peach,
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(_Cute.radiusSm),
               ),
-              child: Icon(
-                Icons.shopping_bag_rounded,
-                color: cute.orangeDeep,
-                size: 22,
-              ),
+              child: Icon(Icons.shopping_bag_rounded, color: cute.orangeDeep, size: 22),
             ),
           ),
         ),
         const SizedBox(width: 12),
-        // Nama toko + tagline
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -401,11 +332,8 @@ class _StoreHeader extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
               Text(
-                'Tas lucu buat semua gaya kamu ',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: cute.textSecondary,
-                ),
+                'Tas lucu buat semua gaya kamu',
+                style: TextStyle(fontSize: 12, color: cute.textSecondary),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -413,57 +341,55 @@ class _StoreHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
-       
-        GestureDetector(
-          onTap: () {},
-          child: Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(
-              color: cute.surface,
-              shape: BoxShape.circle,
-              border: Border.all(color: cute.border, width: 1.5),
-              boxShadow: [
-                BoxShadow(
-                  color: cute.shadow,
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Stack(
-              clipBehavior: Clip.none,
-              alignment: Alignment.center,
-              children: [
-                Icon(
-                  Icons.notifications_outlined,
-                  size: 20,
-                  color: cute.orangeDeep,
-                ),
-                
-                Positioned(
-                  top: 8,
-                  right: 9,
-                  child: Container(
-                    width: 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: cute.surface, width: 1.5),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+        _NotificationButton(cute: cute),
       ],
     );
   }
 }
 
-// Search Bar Widget
+class _NotificationButton extends StatelessWidget {
+  final _Cute cute;
+  const _NotificationButton({required this.cute});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {},
+      child: Container(
+        width: 42,
+        height: 42,
+        decoration: BoxDecoration(
+          color: cute.surface,
+          shape: BoxShape.circle,
+          border: Border.all(color: cute.border, width: 1.5),
+          boxShadow: cute.cardShadow,
+        ),
+        child: Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.center,
+          children: [
+            Icon(Icons.notifications_outlined, size: 20, color: cute.orangeDeep),
+            Positioned(
+              top: 8,
+              right: 9,
+              child: Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: cute.surface, width: 1.5),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Search bar ───────────────────────────────────────────────────────────
 class _SearchBar extends StatelessWidget {
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
@@ -480,22 +406,25 @@ class _SearchBar extends StatelessWidget {
         color: cute.surface,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: cute.border, width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: cute.shadow,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        boxShadow: cute.cardShadow,
       ),
       child: TextField(
         controller: controller,
         onChanged: onChanged,
         style: TextStyle(color: cute.textPrimary),
         decoration: InputDecoration(
-          hintText: 'Cari Tas favoritmu... ',
+          hintText: 'Cari tas favoritmu...',
           hintStyle: TextStyle(color: cute.textHint, fontSize: 14),
           prefixIcon: Icon(Icons.search_rounded, color: cute.orange, size: 22),
+          suffixIcon: controller.text.isEmpty
+              ? null
+              : IconButton(
+                  icon: Icon(Icons.close_rounded, color: cute.textHint, size: 18),
+                  onPressed: () {
+                    controller.clear();
+                    onChanged('');
+                  },
+                ),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 13),
         ),
@@ -504,53 +433,88 @@ class _SearchBar extends StatelessWidget {
   }
 }
 
-// Banner Card Widget
+// ── Banner ───────────────────────────────────────────────────────────────
 class _BannerCard extends StatelessWidget {
-  const _BannerCard({super.key});
+  final String imageUrl;
+  const _BannerCard({required this.imageUrl});
 
   @override
   Widget build(BuildContext context) {
+    final cute = _Cute.of(context);
+
     return ClipRRect(
-      borderRadius: BorderRadius.circular(24),
-      child: SizedBox(
-        height: 200,
-        width: 200,
+      borderRadius: BorderRadius.circular(_Cute.radiusMd + 4),
+      child: AspectRatio(
+        aspectRatio: 16 / 9,
         child: Image.network(
-          "https://i.ibb.co.com/HDDrPZQW/82bc395f-954b-4c0f-a201-d934ac4a42da.png", 
+          imageUrl,
+          width: double.infinity,
+          fit: BoxFit.cover,
           loadingBuilder: (context, child, loadingProgress) {
             if (loadingProgress == null) return child;
-
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          },
-          errorBuilder: (context, error, stackTrace) {
             return Container(
-              color: Colors.grey.shade200,
+              color: cute.peach,
               alignment: Alignment.center,
-              child: const Icon(
-                Icons.broken_image,
-                size: 50,
-              ),
+              child: CircularProgressIndicator(color: cute.orange),
             );
           },
+          errorBuilder: (context, error, stackTrace) => Container(
+            color: cute.peach,
+            alignment: Alignment.center,
+            child: Icon(Icons.broken_image_rounded, size: 40, color: cute.orangeDeep),
+          ),
         ),
       ),
     );
   }
 }
 
+// ── Section header (reused for "Kategori" etc.) ──────────────────────────
+class _SectionHeader extends StatelessWidget {
+  final String title;
+  final String actionLabel;
+  final VoidCallback onAction;
 
+  const _SectionHeader({
+    required this.title,
+    required this.actionLabel,
+    required this.onAction,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cute = _Cute.of(context);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          title,
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: cute.textPrimary),
+        ),
+        TextButton(
+          onPressed: onAction,
+          style: TextButton.styleFrom(
+            padding: EdgeInsets.zero,
+            minimumSize: Size.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          child: Text(
+            actionLabel,
+            style: TextStyle(color: cute.orangeDeep, fontWeight: FontWeight.w700, fontSize: 13),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ── Category chip ────────────────────────────────────────────────────────
 class _CategoryChip extends StatelessWidget {
   final _CategoryItem item;
   final bool selected;
   final VoidCallback onTap;
 
-  const _CategoryChip({
-    required this.item,
-    required this.selected,
-    required this.onTap,
-  });
+  const _CategoryChip({required this.item, required this.selected, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -560,14 +524,12 @@ class _CategoryChip extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
+        curve: Curves.easeOut,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
           color: selected ? cute.orange : cute.surface,
           borderRadius: BorderRadius.circular(22),
-          border: Border.all(
-            color: selected ? cute.orange : cute.border,
-            width: 1.5,
-          ),
+          border: Border.all(color: selected ? cute.orange : cute.border, width: 1.5),
           boxShadow: selected
               ? [
                   BoxShadow(
@@ -576,16 +538,12 @@ class _CategoryChip extends StatelessWidget {
                     offset: const Offset(0, 3),
                   ),
                 ]
-              : [],
+              : const [],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              item.icon,
-              size: 16,
-              color: selected ? Colors.white : cute.orangeDeep,
-            ),
+            Icon(item.icon, size: 16, color: selected ? Colors.white : cute.orangeDeep),
             const SizedBox(width: 6),
             Text(
               item.label,
@@ -602,67 +560,105 @@ class _CategoryChip extends StatelessWidget {
   }
 }
 
-// Product Card Widget
-class _ProductCard extends StatefulWidget {
+// ── Empty / error states ─────────────────────────────────────────────────
+class _EmptyState extends StatelessWidget {
+  const _EmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    final cute = _Cute.of(context);
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.search_off_rounded, size: 40, color: cute.textHint),
+          const SizedBox(height: 8),
+          Text('Produk tidak ditemukan', style: TextStyle(color: cute.textSecondary)),
+        ],
+      ),
+    );
+  }
+}
+
+class _ErrorState extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+  const _ErrorState({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    final cute = _Cute.of(context);
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.error_outline_rounded, size: 36, color: cute.orangeDeep),
+          const SizedBox(height: 12),
+          Text(
+            message,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontWeight: FontWeight.w600, color: cute.textPrimary),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: cute.orange,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            ),
+            icon: const Icon(Icons.refresh_rounded),
+            label: const Text('Coba Lagi'),
+            onPressed: onRetry,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Product card ─────────────────────────────────────────────────────────
+class _ProductCard extends StatelessWidget {
   final ProductModel product;
   final String Function(double) formatPrice;
 
   const _ProductCard({required this.product, required this.formatPrice});
-
-  @override
-  State<_ProductCard> createState() => _ProductCardState();
-}
-
-class _ProductCardState extends State<_ProductCard> {
-  
 
   void _showProductDetail(BuildContext context) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(_Cute.radiusLg)),
       ),
-      builder: (_) => _ProductDetailSheet(
-        product: widget.product,
-        formatPrice: widget.formatPrice,
-      ),
+      builder: (_) => _ProductDetailSheet(product: product, formatPrice: formatPrice),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final p = widget.product;
+    final p = product;
     final cute = _Cute.of(context);
-    final favProv = context.watch<FavoriteProvider>();
-final isFav = favProv.isFavorite(p.id);
 
     return GestureDetector(
       onTap: () => _showProductDetail(context),
       child: Container(
         decoration: BoxDecoration(
           color: cute.surface,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(_Cute.radiusMd),
           border: Border.all(color: cute.border, width: 1.5),
-          boxShadow: [
-            BoxShadow(
-              color: cute.shadow,
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          boxShadow: cute.cardShadow,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Gambar produk
             Expanded(
               flex: 5,
               child: Stack(
                 children: [
                   ClipRRect(
-                    borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(19),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(_Cute.radiusMd - 1),
                     ),
                     child: p.imageUrl.isNotEmpty
                         ? Image.network(
@@ -674,19 +670,14 @@ final isFav = favProv.isFavorite(p.id);
                           )
                         : _imagePlaceholder(cute),
                   ),
-                  // Heart button
                   Positioned(
                     top: 8,
                     right: 8,
                     child: Consumer<FavoriteProvider>(
                       builder: (context, favProv, _) {
-
-                        final isFav = favProv.isFavorite(p.id); // HARUS dari provider
-
+                        final isFav = favProv.isFavorite(p.id);
                         return GestureDetector(
-                          onTap: () {
-                            favProv.toggle(p); // kirim FULL PRODUCT
-                          },
+                          onTap: () => favProv.toggle(p),
                           child: Container(
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
@@ -700,9 +691,7 @@ final isFav = favProv.isFavorite(p.id);
                               ],
                             ),
                             child: Icon(
-                              isFav
-                                  ? Icons.favorite_rounded
-                                  : Icons.favorite_border_rounded,
+                              isFav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
                               size: 16,
                               color: isFav ? Colors.red : cute.textHint,
                             ),
@@ -714,8 +703,6 @@ final isFav = favProv.isFavorite(p.id);
                 ],
               ),
             ),
-
-            // Info produk
             Expanded(
               flex: 4,
               child: Padding(
@@ -723,7 +710,6 @@ final isFav = favProv.isFavorite(p.id);
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Kategori
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                       decoration: BoxDecoration(
@@ -742,7 +728,6 @@ final isFav = favProv.isFavorite(p.id);
                       ),
                     ),
                     const SizedBox(height: 4),
-                    // Nama produk
                     Text(
                       p.name,
                       style: TextStyle(
@@ -755,7 +740,6 @@ final isFav = favProv.isFavorite(p.id);
                       overflow: TextOverflow.ellipsis,
                     ),
                     const Spacer(),
-                    // Rating
                     Row(
                       children: [
                         ...List.generate(
@@ -767,16 +751,12 @@ final isFav = favProv.isFavorite(p.id);
                           ),
                         ),
                         const SizedBox(width: 4),
-                        Text(
-                          '4.6',
-                          style: TextStyle(fontSize: 11, color: cute.textSecondary),
-                        ),
+                        Text('4.6', style: TextStyle(fontSize: 11, color: cute.textSecondary)),
                       ],
                     ),
                     const SizedBox(height: 4),
-                    // Harga
                     Text(
-                      widget.formatPrice(p.price),
+                      formatPrice(p.price),
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w800,
@@ -797,21 +777,16 @@ final isFav = favProv.isFavorite(p.id);
         width: double.infinity,
         height: double.infinity,
         color: cute.peach,
-        child: const Center(
-          child: Text('🍡', style: TextStyle(fontSize: 32)),
-        ),
+        child: const Center(child: Text('🍡', style: TextStyle(fontSize: 32))),
       );
 }
 
-// Product Detail Bottom Sheet
+// ── Product detail sheet ─────────────────────────────────────────────────
 class _ProductDetailSheet extends StatefulWidget {
   final ProductModel product;
   final String Function(double) formatPrice;
 
-  const _ProductDetailSheet({
-    required this.product,
-    required this.formatPrice,
-  });
+  const _ProductDetailSheet({required this.product, required this.formatPrice});
 
   @override
   State<_ProductDetailSheet> createState() => _ProductDetailSheetState();
@@ -834,11 +809,10 @@ class _ProductDetailSheetState extends State<_ProductDetailSheet> {
       builder: (_, scrollCtrl) => Container(
         decoration: BoxDecoration(
           color: cute.bg,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(_Cute.radiusLg)),
         ),
         child: Column(
           children: [
-            // Drag handle
             Container(
               margin: const EdgeInsets.only(top: 12),
               width: 44,
@@ -853,13 +827,12 @@ class _ProductDetailSheetState extends State<_ProductDetailSheet> {
                 controller: scrollCtrl,
                 padding: const EdgeInsets.all(20),
                 children: [
-                  // Gambar produk
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(_Cute.radiusMd),
                     child: Container(
                       decoration: BoxDecoration(
                         border: Border.all(color: cute.border, width: 2),
-                        borderRadius: BorderRadius.circular(20),
+                        borderRadius: BorderRadius.circular(_Cute.radiusMd),
                       ),
                       child: p.imageUrl.isNotEmpty
                           ? Image.network(
@@ -867,19 +840,13 @@ class _ProductDetailSheetState extends State<_ProductDetailSheet> {
                               height: 200,
                               width: double.infinity,
                               fit: BoxFit.cover,
-                              errorBuilder: (ctx, err, stack) => Container(
-                                height: 200,
-                                color: cute.peach,
-                              ),
+                              errorBuilder: (ctx, err, stack) =>
+                                  Container(height: 200, color: cute.peach),
                             )
-                          : Container(
-                              height: 200,
-                              color: cute.peach,
-                            ),
+                          : Container(height: 200, color: cute.peach),
                     ),
                   ),
                   const SizedBox(height: 16),
-                  // Kategori
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
@@ -896,7 +863,6 @@ class _ProductDetailSheetState extends State<_ProductDetailSheet> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  // Nama
                   Text(
                     p.name,
                     style: TextStyle(
@@ -906,7 +872,6 @@ class _ProductDetailSheetState extends State<_ProductDetailSheet> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  // Harga
                   Text(
                     widget.formatPrice(p.price),
                     style: TextStyle(
@@ -916,33 +881,20 @@ class _ProductDetailSheetState extends State<_ProductDetailSheet> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  // Deskripsi
                   Text(
                     p.description,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: cute.textSecondary,
-                      height: 1.5,
-                    ),
+                    style: TextStyle(fontSize: 13, color: cute.textSecondary, height: 1.5),
                   ),
                   const SizedBox(height: 20),
-                  // Quantity stepper
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      GestureDetector(
+                      _QtyButton(
+                        icon: Icons.remove_rounded,
+                        color: cute.orange,
                         onTap: () {
                           if (_qty > 1) setState(() => _qty--);
                         },
-                        child: Container(
-                          width: 38,
-                          height: 38,
-                          decoration: BoxDecoration(
-                            color: cute.orange,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.remove_rounded, size: 18, color: Colors.white),
-                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -955,17 +907,10 @@ class _ProductDetailSheetState extends State<_ProductDetailSheet> {
                           ),
                         ),
                       ),
-                      GestureDetector(
+                      _QtyButton(
+                        icon: Icons.add_rounded,
+                        color: cute.orange,
                         onTap: () => setState(() => _qty++),
-                        child: Container(
-                          width: 38,
-                          height: 38,
-                          decoration: BoxDecoration(
-                            color: cute.orange,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.add_rounded, size: 18, color: Colors.white),
-                        ),
                       ),
                     ],
                   ),
@@ -973,7 +918,6 @@ class _ProductDetailSheetState extends State<_ProductDetailSheet> {
                 ],
               ),
             ),
-            // Tombol Tambah ke Keranjang
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
               child: SizedBox(
@@ -983,9 +927,7 @@ class _ProductDetailSheetState extends State<_ProductDetailSheet> {
                     backgroundColor: cute.orange,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
                     elevation: 3,
                     shadowColor: cute.orange.withValues(alpha: 0.5),
                   ),
@@ -993,25 +935,18 @@ class _ProductDetailSheetState extends State<_ProductDetailSheet> {
                       ? const SizedBox(
                           width: 18,
                           height: 18,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                         )
-                      : const Text('', style: TextStyle(fontSize: 16)),
+                      : const Icon(Icons.shopping_bag_outlined, size: 18),
                   label: Text(
                     cartProv.isAdding ? 'Menambahkan...' : 'Tambah ke Keranjang',
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w800,
-                    ),
+                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
                   ),
                   onPressed: cartProv.isAdding
                       ? null
                       : () async {
-                          final success = await context
-                              .read<CartProvider>()
-                              .addToCart(p.id, _qty);
+                          final success =
+                              await context.read<CartProvider>().addToCart(p.id, _qty);
                           if (!context.mounted) return;
                           Navigator.pop(context);
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -1021,12 +956,9 @@ class _ProductDetailSheetState extends State<_ProductDetailSheet> {
                                     ? '${p.name} ditambahkan ke keranjang'
                                     : 'Gagal menambahkan ke keranjang',
                               ),
-                              backgroundColor:
-                                  success ? cute.orangeDeep : Colors.red,
+                              backgroundColor: success ? cute.orangeDeep : Colors.red,
                               behavior: SnackBarBehavior.floating,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                               duration: const Duration(seconds: 2),
                             ),
                           );
@@ -1041,7 +973,27 @@ class _ProductDetailSheetState extends State<_ProductDetailSheet> {
   }
 }
 
-// Bottom Navigation Bar
+class _QtyButton extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+  const _QtyButton({required this.icon, required this.color, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 38,
+        height: 38,
+        decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        child: Icon(icon, size: 18, color: Colors.white),
+      ),
+    );
+  }
+}
+
+// ── Bottom navigation ─────────────────────────────────────────────────────
 class _BottomNav extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onTap;
@@ -1063,13 +1015,9 @@ class _BottomNav extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: cute.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(_Cute.radiusLg)),
         boxShadow: [
-          BoxShadow(
-            color: cute.shadow,
-            blurRadius: 16,
-            offset: const Offset(0, -4),
-          ),
+          BoxShadow(color: cute.shadow, blurRadius: 16, offset: const Offset(0, -4)),
         ],
       ),
       child: SafeArea(
@@ -1116,9 +1064,7 @@ class _BottomNav extends StatelessWidget {
                                   ),
                                   alignment: Alignment.center,
                                   child: Text(
-                                    cartItemCount > 99
-                                        ? '99+'
-                                        : '$cartItemCount',
+                                    cartItemCount > 99 ? '99+' : '$cartItemCount',
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 9,
@@ -1151,7 +1097,7 @@ class _BottomNav extends StatelessWidget {
   }
 }
 
-// Data classes
+// ── Data classes ─────────────────────────────────────────────────────────
 class _CategoryItem {
   final String label;
   final IconData icon;
