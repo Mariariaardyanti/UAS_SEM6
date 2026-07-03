@@ -16,8 +16,12 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  // Aksen oren dipakai konsisten untuk icon & link di halaman ini.
+  
   static const Color _accentOrange = Color(0xFFFF7A29);
+
+ 
+  static const String _logoUrl =
+      'https://i.ibb.co.com/0VWk0BDJ/36581ebf-d1b2-4e22-8d18-b6b19368c6f3-removebg-preview.png';
 
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
@@ -74,7 +78,44 @@ class _RegisterPageState extends State<RegisterPage> {
               key: _formKey,
               child: Column(
                 children: [
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 24),
+                 
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Image.network(
+                      _logoUrl,
+                      width: 84,
+                      height: 84,
+                      fit: BoxFit.cover,
+                      loadingBuilder: (context, child, progress) {
+                        if (progress == null) return child;
+                        return const SizedBox(
+                          width: 84,
+                          height: 84,
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: _accentOrange,
+                            ),
+                          ),
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        width: 84,
+                        height: 84,
+                        decoration: BoxDecoration(
+                          color: _accentOrange.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Icon(
+                          Icons.storefront_rounded,
+                          size: 36,
+                          color: _accentOrange,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
                   const AuthHeader(
                     icon: Icons.storefront_rounded,
                     title: 'Buat Akun Baru',

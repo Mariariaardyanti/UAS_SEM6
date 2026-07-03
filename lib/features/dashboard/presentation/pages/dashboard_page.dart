@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:pasar_malam/features/favorite/presentation/providers/favorite_provider.dart';
 import 'package:pasar_malam/features/favorite/presentation/pages/favorite_page.dart';
 
-// ── Palet oren gemas, otomatis nyesuain terang/gelap ───────
+// Palet oren gemas, otomatis nyesuain terang/gelap
 class _Cute {
   final bool isDark;
   const _Cute(this.isDark);
@@ -56,14 +56,19 @@ class _DashboardPageState extends State<DashboardPage> {
   String _selectedCategory = 'All';
   final _searchCtrl = TextEditingController();
 
+  
+  static const String _storeLogoUrl =
+      'https://i.ibb.co.com/0VWk0BDJ/36581ebf-d1b2-4e22-8d18-b6b19368c6f3-removebg-preview.png';
+
+  
   final List<_CategoryItem> _categories = const [
     _CategoryItem(label: 'All', icon: Icons.apps_rounded),
-    _CategoryItem(label: 'Running', icon: Icons.directions_run_rounded),
-    _CategoryItem(label: 'Lifestyle', icon: Icons.style_rounded),
-    _CategoryItem(label: 'Football', icon: Icons.sports_soccer_rounded),
-    _CategoryItem(label: 'Volleyball', icon: Icons.sports_volleyball_rounded),
-    _CategoryItem(label: 'Tennis', icon: Icons.sports_tennis_rounded),
-    _CategoryItem(label: 'Badminton', icon: Icons.sports_rounded),
+    _CategoryItem(label: 'Ransel', icon: Icons.backpack_rounded),
+    _CategoryItem(label: 'Selempang', icon: Icons.shopping_bag_outlined),
+    _CategoryItem(label: 'Tote', icon: Icons.shopping_bag_rounded),
+    _CategoryItem(label: 'Pinggang', icon: Icons.style_rounded),
+    _CategoryItem(label: 'Laptop', icon: Icons.laptop_mac_rounded),
+    _CategoryItem(label: 'Travel', icon: Icons.card_travel_rounded),
   ];
 
   @override
@@ -120,14 +125,22 @@ class _DashboardPageState extends State<DashboardPage> {
       body: SafeArea(
         child: Column(
           children: [
-            // ── Body scroll ─────────────────────────────────
+            // Body scroll
             Expanded(
               child: RefreshIndicator(
                 color: cute.orange,
                 onRefresh: () => productProv.fetchProducts(),
                 child: CustomScrollView(
                   slivers: [
-                    // ── Search Bar ─────────────────────────
+                    // Store Header (logo + nama toko + notifikasi dummy)
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                        child: _StoreHeader(logoUrl: _storeLogoUrl),
+                      ),
+                    ),
+
+                    // Search Bar
                     SliverToBoxAdapter(
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
@@ -135,7 +148,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       ),
                     ),
 
-                    // ── Banner ─────────────────────────────
+                    // Banner
                     const SliverToBoxAdapter(
                       child: Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16),
@@ -143,7 +156,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       ),
                     ),
 
-                    // ── Categories ─────────────────────────
+                    // Categories
                     SliverToBoxAdapter(
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
@@ -193,7 +206,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       ),
                     ),
 
-                    // ── For You label ─────────────────────
+                    // For You label
                     SliverToBoxAdapter(
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(16, 24, 16, 12),
@@ -208,7 +221,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       ),
                     ),
 
-                    // ── Product Grid ──────────────────────
+                    // Product Grid
                     switch (productProv.status) {
                       ProductStatus.loading || ProductStatus.initial =>
                         SliverFillRemaining(
@@ -285,7 +298,7 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
             ),
 
-            // ── Bottom Navigation Bar ────────────────────
+            // Bottom Navigation Bar
             _BottomNav(
             selectedIndex: _selectedNav,
             onTap: (i) {
@@ -324,7 +337,133 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 }
 
-// ── Search Bar Widget ──────────────────────────────────────
+
+class _StoreHeader extends StatelessWidget {
+  final String logoUrl;
+  const _StoreHeader({required this.logoUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    final cute = _Cute.of(context);
+
+    return Row(
+      children: [
+        
+        ClipRRect(
+          borderRadius: BorderRadius.circular(14),
+          child: Image.network(
+            logoUrl,
+            width: 46,
+            height: 46,
+            fit: BoxFit.cover,
+            loadingBuilder: (context, child, progress) {
+              if (progress == null) return child;
+              return SizedBox(
+                width: 46,
+                height: 46,
+                child: Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: cute.orange,
+                  ),
+                ),
+              );
+            },
+            errorBuilder: (context, error, stackTrace) => Container(
+              width: 46,
+              height: 46,
+              decoration: BoxDecoration(
+                color: cute.peach,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(
+                Icons.shopping_bag_rounded,
+                color: cute.orangeDeep,
+                size: 22,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        // Nama toko + tagline
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Tas Lucu Store',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w800,
+                  color: cute.textPrimary,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              Text(
+                'Tas lucu buat semua gaya kamu ',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: cute.textSecondary,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 8),
+       
+        GestureDetector(
+          onTap: () {},
+          child: Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: cute.surface,
+              shape: BoxShape.circle,
+              border: Border.all(color: cute.border, width: 1.5),
+              boxShadow: [
+                BoxShadow(
+                  color: cute.shadow,
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.center,
+              children: [
+                Icon(
+                  Icons.notifications_outlined,
+                  size: 20,
+                  color: cute.orangeDeep,
+                ),
+                
+                Positioned(
+                  top: 8,
+                  right: 9,
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: cute.surface, width: 1.5),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// Search Bar Widget
 class _SearchBar extends StatelessWidget {
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
@@ -365,7 +504,7 @@ class _SearchBar extends StatelessWidget {
   }
 }
 
-// ── Banner Card Widget ─────────────────────────────────────
+// Banner Card Widget
 class _BannerCard extends StatelessWidget {
   const _BannerCard({super.key});
 
@@ -401,7 +540,7 @@ class _BannerCard extends StatelessWidget {
   }
 }
 
-// ── Category Chip Widget ───────────────────────────────────
+
 class _CategoryChip extends StatelessWidget {
   final _CategoryItem item;
   final bool selected;
@@ -463,7 +602,7 @@ class _CategoryChip extends StatelessWidget {
   }
 }
 
-// ── Product Card Widget ────────────────────────────────────
+// Product Card Widget
 class _ProductCard extends StatefulWidget {
   final ProductModel product;
   final String Function(double) formatPrice;
@@ -516,7 +655,7 @@ final isFav = favProv.isFavorite(p.id);
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Gambar produk ───────────────────────────
+            // Gambar produk
             Expanded(
               flex: 5,
               child: Stack(
@@ -536,48 +675,47 @@ final isFav = favProv.isFavorite(p.id);
                         : _imagePlaceholder(cute),
                   ),
                   // Heart button
-                  // Heart button
-Positioned(
-  top: 8,
-  right: 8,
-  child: Consumer<FavoriteProvider>(
-    builder: (context, favProv, _) {
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Consumer<FavoriteProvider>(
+                      builder: (context, favProv, _) {
 
-      final isFav = favProv.isFavorite(p.id); // HARUS dari provider
+                        final isFav = favProv.isFavorite(p.id); // HARUS dari provider
 
-      return GestureDetector(
-        onTap: () {
-          favProv.toggle(p); // kirim FULL PRODUCT
-        },
-        child: Container(
-          padding: const EdgeInsets.all(6),
-          decoration: BoxDecoration(
-            color: cute.surface,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.15),
-                blurRadius: 4,
-              ),
-            ],
-          ),
-          child: Icon(
-            isFav
-                ? Icons.favorite_rounded
-                : Icons.favorite_border_rounded,
-            size: 16,
-            color: isFav ? Colors.red : cute.textHint,
-          ),
-        ),
-      );
-    },
-  ),
-),
+                        return GestureDetector(
+                          onTap: () {
+                            favProv.toggle(p); // kirim FULL PRODUCT
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: cute.surface,
+                              shape: BoxShape.circle,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.15),
+                                  blurRadius: 4,
+                                ),
+                              ],
+                            ),
+                            child: Icon(
+                              isFav
+                                  ? Icons.favorite_rounded
+                                  : Icons.favorite_border_rounded,
+                              size: 16,
+                              color: isFav ? Colors.red : cute.textHint,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 ],
               ),
             ),
 
-            // ── Info produk ────────────────────────────
+            // Info produk
             Expanded(
               flex: 4,
               child: Padding(
@@ -665,7 +803,7 @@ Positioned(
       );
 }
 
-// ── Product Detail Bottom Sheet ────────────────────────────
+// Product Detail Bottom Sheet
 class _ProductDetailSheet extends StatefulWidget {
   final ProductModel product;
   final String Function(double) formatPrice;
@@ -903,7 +1041,7 @@ class _ProductDetailSheetState extends State<_ProductDetailSheet> {
   }
 }
 
-// ── Bottom Navigation Bar ──────────────────────────────────
+// Bottom Navigation Bar
 class _BottomNav extends StatelessWidget {
   final int selectedIndex;
   final ValueChanged<int> onTap;
@@ -1013,7 +1151,7 @@ class _BottomNav extends StatelessWidget {
   }
 }
 
-// ── Data classes ───────────────────────────────────────────
+// Data classes
 class _CategoryItem {
   final String label;
   final IconData icon;

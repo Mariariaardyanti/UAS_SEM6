@@ -3,10 +3,10 @@ import 'package:pasar_malam/features/order/data/models/order_model.dart';
 import 'package:pasar_malam/features/order/presentation/providers/order_provider.dart';
 import 'package:provider/provider.dart';
 
-// ── Orange theme accents (UI only) ─────────────────────────
-const Color _kOrangePrimary = Color(0xFFFF7A00);
-const Color _kOrangeDark = Color(0xFFE65100);
-const Color _kBg = Color(0xFFFAFAFA);
+// Orange theme accents (UI only)
+const Color kOrangePrimary = Color(0xFFFF7A00);
+const Color kOrangeDark = Color(0xFFE65100);
+const Color kBg = Color(0xFFFAFAFA);
 
 class MyOrdersPage extends StatefulWidget {
   const MyOrdersPage({super.key});
@@ -36,30 +36,43 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
     return 'Rp. ${buffer.toString().split('').reversed.join()}';
   }
 
+  // Mengembalikan string kosong ('') jika createdAt tidak tersedia,
+  // sehingga UI bisa menyembunyikan baris tanggal sepenuhnya alih-alih
+  // menampilkan tanda '-'.
   String _formatDate(String createdAt) {
-    if (createdAt.isEmpty) return '-';
+    if (createdAt.isEmpty) return '';
     try {
       final dt = DateTime.parse(createdAt);
       final months = [
-        'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
-        'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des',
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'Mei',
+        'Jun',
+        'Jul',
+        'Agu',
+        'Sep',
+        'Okt',
+        'Nov',
+        'Des',
       ];
       return '${dt.day} ${months[dt.month - 1]} ${dt.year}';
     } catch (_) {
-      return createdAt;
+      return '';
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _kBg,
+      backgroundColor: kBg,
       appBar: AppBar(
         title: const Text(
           'Pesanan Saya',
           style: TextStyle(fontWeight: FontWeight.w700, color: Colors.white),
         ),
-        backgroundColor: _kOrangePrimary,
+        backgroundColor: kOrangePrimary,
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -67,7 +80,7 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
         builder: (context, orderProv, _) {
           if (orderProv.checkoutStatus == OrderStatus.loading) {
             return const Center(
-              child: CircularProgressIndicator(color: _kOrangePrimary),
+              child: CircularProgressIndicator(color: kOrangePrimary),
             );
           }
 
@@ -84,7 +97,7 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
                     icon: const Icon(Icons.refresh),
                     label: const Text('Coba Lagi'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: _kOrangePrimary,
+                      backgroundColor: kOrangePrimary,
                       foregroundColor: Colors.white,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
@@ -106,7 +119,7 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
                   Icon(
                     Icons.receipt_long_outlined,
                     size: 72,
-                    color: _kOrangePrimary.withValues(alpha: 0.25),
+                    color: kOrangePrimary.withValues(alpha: 0.25),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -124,7 +137,7 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
           }
 
           return RefreshIndicator(
-            color: _kOrangePrimary,
+            color: kOrangePrimary,
             onRefresh: () => orderProv.fetchMyOrders(),
             child: ListView.separated(
               padding: const EdgeInsets.all(16),
@@ -143,7 +156,7 @@ class _MyOrdersPageState extends State<MyOrdersPage> {
   }
 }
 
-// ── Order Card ─────────────────────────────────────────────
+// Order Card
 class _OrderCard extends StatelessWidget {
   final OrderModel order;
   final String Function(double) formatPrice;
@@ -193,6 +206,7 @@ class _OrderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final onSurface = Theme.of(context).colorScheme.onSurface;
     final statusColor = _statusColor(order.status);
+    final dateText = formatDate(order.createdAt);
 
     return Container(
       decoration: BoxDecoration(
@@ -201,7 +215,7 @@ class _OrderCard extends StatelessWidget {
         border: Border.all(color: const Color(0xFFF0F0F0)),
         boxShadow: [
           BoxShadow(
-            color: _kOrangePrimary.withValues(alpha: 0.06),
+            color: kOrangePrimary.withValues(alpha: 0.06),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -213,97 +227,102 @@ class _OrderCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header: order id + status chip
-            // Header
-Row(
-  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  children: [
-    Text(
-      'Order #${order.id}',
-      style: const TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.bold,
-        color: _kOrangeDark,
-      ),
-    ),
-    Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: statusColor.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        _statusLabel(order.status),
-        style: TextStyle(
-          fontSize: 11,
-          fontWeight: FontWeight.w600,
-          color: statusColor,
-        ),
-      ),
-    ),
-  ],
-),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Order #${order.id}',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: kOrangeDark,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: statusColor.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    _statusLabel(order.status),
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: statusColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
 
-const SizedBox(height: 6),
+            // Baris tanggal hanya ditampilkan jika datanya ada,
+            // supaya tidak ada tanda '-' menggantung.
+            if (dateText.isNotEmpty) ...[
+              const SizedBox(height: 6),
+              Text(
+                dateText,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: onSurface.withValues(alpha: 0.5),
+                ),
+              ),
+            ],
 
-Text(
-  formatDate(order.createdAt),
-  style: TextStyle(
-    fontSize: 12,
-    color: onSurface.withValues(alpha: 0.5),
-  ),
-),
+            const Divider(height: 20),
 
-const Divider(height: 20),
+            // Produk
+            ...order.items.map(
+              (item) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.shopping_bag_outlined,
+                      size: 18,
+                      color: kOrangePrimary,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        item.productName,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    Text("x${item.quantity}"),
+                  ],
+                ),
+              ),
+            ),
 
-// Produk
-...order.items.map(
-  (item) => Padding(
-    padding: const EdgeInsets.only(bottom: 8),
-    child: Row(
-      children: [
-        const Icon(
-          Icons.shopping_bag_outlined,
-          size: 18,
-          color: _kOrangePrimary,
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-  item.productName,
-  style: const TextStyle(
-    fontSize: 14,
-    fontWeight: FontWeight.w600,
-  ),
-),
-        ),
-        Text("x${item.quantity}"),
-      ],
-    ),
-  ),
-),
+            const Divider(height: 20),
 
-const Divider(height: 20),
-
-Row(
-  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  children: [
-    Text(
-      '${order.items.length} item',
-      style: TextStyle(
-        fontSize: 13,
-        color: onSurface.withValues(alpha: 0.7),
-      ),
-    ),
-    Text(
-      formatPrice(order.totalAmount),
-      style: const TextStyle(
-        fontSize: 15,
-        fontWeight: FontWeight.bold,
-        color: _kOrangePrimary,
-      ),
-    ),
-  ],
-),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${order.items.length} item',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: onSurface.withValues(alpha: 0.7),
+                  ),
+                ),
+                Text(
+                  formatPrice(order.totalAmount),
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: kOrangePrimary,
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
