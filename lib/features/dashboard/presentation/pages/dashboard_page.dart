@@ -50,8 +50,14 @@ class _Cute {
   static const double gapMd = 16;
   static const double gapLg = 24;
 
+  // Shadow tipis, dipakai buat elemen kecil (chip, tombol ikon)
   List<BoxShadow> get cardShadow => [
-        BoxShadow(color: shadow, blurRadius: 10, offset: const Offset(0, 3)),
+        BoxShadow(color: shadow, blurRadius: 8, offset: const Offset(0, 2)),
+      ];
+
+  // Shadow super halus, khusus buat product card biar keliatan clean
+  List<BoxShadow> get softShadow => [
+        BoxShadow(color: shadow, blurRadius: 12, offset: const Offset(0, 4)),
       ];
 }
 
@@ -121,6 +127,12 @@ class _DashboardPageState extends State<DashboardPage> {
     return 'Rp ${buffer.toString().split('').reversed.join()}';
   }
 
+  void _openCart() {
+    Navigator.pushNamed(context, AppRouter.cart).then((_) {
+      if (mounted) context.read<CartProvider>().fetchCart();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final productProv = context.watch<ProductProvider>();
@@ -142,8 +154,12 @@ class _DashboardPageState extends State<DashboardPage> {
                   slivers: [
                     SliverToBoxAdapter(
                       child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                        child: _StoreHeader(logoUrl: _storeLogoUrl),
+                        // Sedikit ditambah jarak atas biar logo & nama toko turun dikit
+                        padding: const EdgeInsets.fromLTRB(16, 22, 16, 0),
+                        child: _StoreHeader(
+                          logoUrl: _storeLogoUrl,
+                          onCartTap: _openCart,
+                        ),
                       ),
                     ),
                     SliverToBoxAdapter(
@@ -249,9 +265,7 @@ class _DashboardPageState extends State<DashboardPage> {
               onTap: (i) {
                 switch (i) {
                   case 1:
-                    Navigator.pushNamed(context, AppRouter.cart).then((_) {
-                      if (context.mounted) context.read<CartProvider>().fetchCart();
-                    });
+                    _openCart();
                     break;
                   case 2:
                     Navigator.push(
@@ -280,7 +294,8 @@ class _DashboardPageState extends State<DashboardPage> {
 // ── Store header ────────────────────────────────────────────────────────────
 class _StoreHeader extends StatelessWidget {
   final String logoUrl;
-  const _StoreHeader({required this.logoUrl});
+  final VoidCallback onCartTap;
+  const _StoreHeader({required this.logoUrl, required this.onCartTap});
 
   @override
   Widget build(BuildContext context) {
@@ -341,8 +356,66 @@ class _StoreHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 8),
+        // Cart & notifikasi didekatkan jadi satu grup di kanan
+        _CartButton(cute: cute, onTap: onCartTap),
+        const SizedBox(width: 8),
         _NotificationButton(cute: cute),
       ],
+    );
+  }
+}
+
+class _CartButton extends StatelessWidget {
+  final _Cute cute;
+  final VoidCallback onTap;
+  const _CartButton({required this.cute, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final itemCount = context.watch<CartProvider>().itemCount;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 42,
+        height: 42,
+        decoration: BoxDecoration(
+          color: cute.surface,
+          shape: BoxShape.circle,
+          border: Border.all(color: cute.border, width: 1.5),
+          boxShadow: cute.cardShadow,
+        ),
+        child: Stack(
+          clipBehavior: Clip.none,
+          alignment: Alignment.center,
+          children: [
+            Icon(Icons.shopping_bag_outlined, size: 20, color: cute.orangeDeep),
+            if (itemCount > 0)
+              Positioned(
+                top: -4,
+                right: -4,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                  constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                  decoration: BoxDecoration(
+                    color: cute.orangeDeep,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: cute.surface, width: 1.5),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    itemCount > 9 ? '9+' : '$itemCount',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 9,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -618,6 +691,8 @@ class _ErrorState extends StatelessWidget {
 }
 
 // ── Product card ─────────────────────────────────────────────────────────
+// Didesain ulang biar lebih clean: shadow lebih tipis, tanpa border tebal,
+// spacing lebih rapi, dan hierarki teks yang lebih jelas.
 class _ProductCard extends StatelessWidget {
   final ProductModel product;
   final String Function(double) formatPrice;
@@ -646,8 +721,7 @@ class _ProductCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: cute.surface,
           borderRadius: BorderRadius.circular(_Cute.radiusMd),
-          border: Border.all(color: cute.border, width: 1.5),
-          boxShadow: cute.cardShadow,
+          boxShadow: cute.softShadow,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -658,7 +732,7 @@ class _ProductCard extends StatelessWidget {
                 children: [
                   ClipRRect(
                     borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(_Cute.radiusMd - 1),
+                      top: Radius.circular(_Cute.radiusMd),
                     ),
                     child: p.imageUrl.isNotEmpty
                         ? Image.network(
@@ -680,19 +754,13 @@ class _ProductCard extends StatelessWidget {
                           onTap: () => favProv.toggle(p),
                           child: Container(
                             padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: cute.surface,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
                               shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.15),
-                                  blurRadius: 4,
-                                ),
-                              ],
                             ),
                             child: Icon(
                               isFav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                              size: 16,
+                              size: 15,
                               color: isFav ? Colors.red : cute.textHint,
                             ),
                           ),
@@ -700,20 +768,13 @@ class _ProductCard extends StatelessWidget {
                       },
                     ),
                   ),
-                ],
-              ),
-            ),
-            Expanded(
-              flex: 4,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                  Positioned(
+                    left: 8,
+                    top: 8,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                       decoration: BoxDecoration(
-                        color: cute.peach,
+                        color: Colors.white.withValues(alpha: 0.92),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Text(
@@ -727,34 +788,36 @@ class _ProductCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              flex: 4,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
                     Text(
                       p.name,
                       style: TextStyle(
                         fontSize: 13,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w700,
                         color: cute.textPrimary,
                         height: 1.3,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const Spacer(),
                     Row(
                       children: [
-                        ...List.generate(
-                          5,
-                          (i) => Icon(
-                            i < 4 ? Icons.star_rounded : Icons.star_half_rounded,
-                            size: 13,
-                            color: cute.yellowAccent,
-                          ),
-                        ),
-                        const SizedBox(width: 4),
+                        Icon(Icons.star_rounded, size: 14, color: cute.yellowAccent),
+                        const SizedBox(width: 2),
                         Text('4.6', style: TextStyle(fontSize: 11, color: cute.textSecondary)),
                       ],
                     ),
-                    const SizedBox(height: 4),
                     Text(
                       formatPrice(p.price),
                       style: TextStyle(
