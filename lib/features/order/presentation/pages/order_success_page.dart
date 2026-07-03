@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:pasar_malam/core/routes/app_router.dart';
 import 'package:pasar_malam/features/order/data/models/order_model.dart';
 
+// ── Orange theme accents (UI only) ─────────────────────────
+const Color _kOrangePrimary = Color(0xFFFF7A00);
+const Color _kOrangeDark = Color(0xFFE65100);
+const Color _kBg = Color(0xFFFAFAFA);
+
 class OrderSuccessPage extends StatelessWidget {
   final OrderModel order;
 
@@ -51,14 +56,19 @@ class OrderSuccessPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final primary = Theme.of(context).colorScheme.primary;
-    final surface = Theme.of(context).colorScheme.surface;
     final onSurface = Theme.of(context).colorScheme.onSurface;
 
     return Scaffold(
+      backgroundColor: _kBg,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text('Status Pesanan'),
+        title: const Text(
+          'Status Pesanan',
+          style: TextStyle(fontWeight: FontWeight.w700, color: Colors.white),
+        ),
+        backgroundColor: _kOrangePrimary,
+        foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -92,7 +102,7 @@ class OrderSuccessPage extends StatelessWidget {
               Text(
                 'Order #${order.id}',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: primary,
+                      color: _kOrangeDark,
                       fontWeight: FontWeight.w600,
                     ),
               ),
@@ -102,13 +112,14 @@ class OrderSuccessPage extends StatelessWidget {
               Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: surface,
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: const Color(0xFFF0F0F0)),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.06),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
+                      color: _kOrangePrimary.withValues(alpha: 0.06),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
@@ -120,9 +131,9 @@ class OrderSuccessPage extends StatelessWidget {
                         label: 'Metode Pembayaran',
                         value: _paymentMethodLabel(order.paymentMethod),
                         icon: Icons.payment,
-                        iconColor: primary,
+                        iconColor: _kOrangePrimary,
                       ),
-                      const Divider(height: 20),
+                      const Divider(height: 20, color: Color(0xFFF0F0F0)),
                       _InfoRow(
                         label: 'Total Pembayaran',
                         value: _formatPrice(order.totalAmount),
@@ -130,7 +141,7 @@ class OrderSuccessPage extends StatelessWidget {
                         iconColor: Colors.green,
                         valueBold: true,
                       ),
-                      const Divider(height: 20),
+                      const Divider(height: 20, color: Color(0xFFF0F0F0)),
                       _InfoRow(
                         label: 'Status',
                         value: _statusLabel(order.status),
@@ -153,10 +164,10 @@ class OrderSuccessPage extends StatelessWidget {
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(14),
                     ),
-                    side: BorderSide(color: primary),
-                    foregroundColor: primary,
+                    side: const BorderSide(color: _kOrangePrimary, width: 1.5),
+                    foregroundColor: _kOrangePrimary,
                   ),
                   onPressed: () {
                     Navigator.pushNamed(
@@ -176,11 +187,12 @@ class OrderSuccessPage extends StatelessWidget {
                   icon: const Icon(Icons.home_outlined),
                   label: const Text('Kembali ke Beranda'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: primary,
+                    backgroundColor: _kOrangePrimary,
                     foregroundColor: Colors.white,
+                    elevation: 0,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(14),
                     ),
                   ),
                   onPressed: () {
@@ -221,8 +233,16 @@ class _InfoRow extends StatelessWidget {
 
     return Row(
       children: [
-        Icon(icon, color: iconColor, size: 20),
-        const SizedBox(width: 10),
+        Container(
+          width: 34,
+          height: 34,
+          decoration: BoxDecoration(
+            color: iconColor.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(9),
+          ),
+          child: Icon(icon, color: iconColor, size: 18),
+        ),
+        const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
