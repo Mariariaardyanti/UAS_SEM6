@@ -330,51 +330,52 @@ flutter run
 
 ## 📸 Hasil Screenshot Tampilan Aplikasi
 
-### 📲 Dompet Muu 
+## 📸 Hasil Screenshot Tampilan Aplikasi
+
+### 👜 Bag Store
 
 <table>
   <tr>
-    <td align="center"><b>1. Tampilan Awal (Splash Screen)</b></td>
-    <td align="center"><b>2. Halaman Login</b></td>
-    <td align="center"><b>3. Halaman Daftar Akun</b></td>
+    <td align="center"><b>1. Splash Screen</b></td>
+    <td align="center"><b>2. Login</b></td>
+    <td align="center"><b>3. Register</b></td>
   </tr>
   <tr>
-    <td align="center"><img src="assets/images/pasar_malem/1.jpeg" width="250"></td>
-    <td align="center"><img src="assets/images/pasar_malemy/2.jpeg" width="250"></td>
-    <td align="center"><img src="assets/images/pasar_malem/3.jpeg" width="250"></td>
+    <td align="center"><img src="assets/images/1.jpeg" width="250"></td>
+    <td align="center"><img src="assets/images/2.jpeg" width="250"></td>
+    <td align="center"><img src="assets/images/3.jpeg" width="250"></td>
+  </tr>
+
+  <tr>
+    <td align="center"><b>4. Home</b></td>
+    <td align="center"><b>5. Detail Produk</b></td>
+    <td align="center"><b>6. Keranjang</b></td>
   </tr>
   <tr>
-    <td align="center"><b>4. Verifikasi OTP</b></td>
-    <td align="center"><b>5. Halaman Beranda (Home)</b></td>
-    <td align="center"><b>6. Halaman Top Up Saldo</b></td>
+    <td align="center"><img src="assets/images/4.jpeg" width="250"></td>
+    <td align="center"><img src="assets/images/5.jpeg" width="250"></td>
+    <td align="center"><img src="assets/images/6.jpeg" width="250"></td>
+  </tr>
+
+  <tr>
+    <td align="center"><b>7. Favorit</b></td>
+    <td align="center"><b>8. Checkout</b></td>
+    <td align="center"><b>9. Riwayat Pesanan</b></td>
   </tr>
   <tr>
-    <td align="center"><img src="assets/images/pasar_malem/4.jpeg" width="250"></td>
-    <td align="center"><img src="assets/images/pasar_malem/5.jpeg" width="250"></td>
-    <td align="center"><img src="assets/images/pasar_malem/6.jpeg" width="250"></td>
+    <td align="center"><img src="assets/images/7.jpeg" width="250"></td>
+    <td align="center"><img src="assets/images/8.jpeg" width="250"></td>
+    <td align="center"><img src="assets/images/9.jpeg" width="250"></td>
   </tr>
+
   <tr>
-    <td align="center"><b>7. Halaman Profil & Akun</b></td>
-    <td align="center"><b>8. Halaman Autentikator</b></td>
-    <td align="center"><b>9. Pengaturan 2FA</b></td>
-  </tr>
-  <tr>
-    <td align="center"><img src="assets/images/pasar_malem/7.jpeg" width="250"></td>
-    <td align="center"><img src="assets/images/pasar_malem/8.jpeg" width="250"></td>
-    <td align="center"><img src="assets/images/1pasar_malem/9.jpeg" width="250"></td>
-  </tr>
-  <tr>
-    <td align="center"><b>10. Konfirmasi Pembayaran</b></td>
-    <td align="center"><b>11. Riwayat Semua Transaksi</b></td>
+    <td align="center"><b>10. Profil</b></td>
+    <td align="center"><b>11. Edit Profil</b></td>
     <td></td>
-    <td></td>
   </tr>
   <tr>
-    <td align="center"><img src="assets/images/pasar_malem/10.jpeg" width="250"></td>
-    <td align="center"><img src="assets/images/pasar_malem/11.jpeg" width="250"></td>
-    <td></td>
+    <td align="center"><img src="assets/images/10.jpeg" width="250"></td>
+    <td align="center"><img src="assets/images/11.jpeg" width="250"></td>
     <td></td>
   </tr>
 </table>
-
-
