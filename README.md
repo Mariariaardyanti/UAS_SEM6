@@ -347,9 +347,9 @@ flutter run
   </tr>
 
   <tr>
-    <td align="center"><b>4. Home</b></td>
+    <td align="center"><b>4. Verifikasi OTP</b></td>
     <td align="center"><b>5. Detail Produk</b></td>
-    <td align="center"><b>6. Keranjang</b></td>
+    <td align="center"><b>6. Halaman Top Up Saldo</b></td>
   </tr>
   <tr>
     <td align="center"><img src="assets/images/4.jpeg" width="250"></td>
@@ -358,9 +358,9 @@ flutter run
   </tr>
 
   <tr>
-    <td align="center"><b>7. Favorit</b></td>
-    <td align="center"><b>8. Checkout</b></td>
-    <td align="center"><b>9. Riwayat Pesanan</b></td>
+    <td align="center"><b>7. Halaman Profil</b></td>
+    <td align="center"><b>8. Halaman Autentikator</b></td>
+    <td align="center"><b>9. Pengaturan 2FA</b></td>
   </tr>
   <tr>
     <td align="center"><img src="assets/images/7.jpeg" width="250"></td>
@@ -369,8 +369,8 @@ flutter run
   </tr>
 
   <tr>
-    <td align="center"><b>10. Profil</b></td>
-    <td align="center"><b>11. Edit Profil</b></td>
+    <td align="center"><b>10. Konfirmasi Pembayaran</b></td>
+    <td align="center"><b>11. Riwayat Semua Transaksi</b></td>
     <td></td>
   </tr>
   <tr>
