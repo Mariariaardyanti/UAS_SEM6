@@ -332,7 +332,7 @@ flutter run
 
 ## 📸 Hasil Screenshot Tampilan Aplikasi
 
-### 👜 Bag Store
+### Dommpet Muu
 
 <table>
   <tr>
@@ -379,3 +379,40 @@ flutter run
     <td></td>
   </tr>
 </table>
+
+###  Bag Store
+<table>
+  <tr>
+    <td align="center"><b>1. Halaman Login</b></td>
+    <td align="center"><b>2. Halaman Daftar Akun</b></td>
+    <td align="center"><b>3. Halaman Beranda (Home)</b></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="assets/images/1a.jpeg" width="250"></td>
+    <td align="center"><img src="assets/images/2a.jpeg" width="250"></td>
+    <td align="center"><img src="assets/images/3a.jpeg" width="250"></td>
+  </tr>
+  <tr>
+    <td align="center"><b>4. Halaman Profil & Akun</b></td>
+    <td align="center"><b>5. Halaman Keranjang</b></td>
+    <td align="center"><b>6. Pilihan CheckOut</b></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="assets/images/4a.jpeg" width="250"></td>
+    <td align="center"><img src="assets/images/6a.jpeg" width="250"></td>
+    <td align="center"><img src="assets/images/5a.jpeg" width="250"></td>
+  </tr>
+  <tr>
+    <td align="center"><b>7. Konfirmasi Pembayaran</b></td>
+    <td align="center"><b>8. Halaman Pesanan Saya</b></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="assets/images/7a.jpeg" width="250"></td>
+    <td align="center"><img src="assets/images/8a.jpeg" width="250"></td>
+    <td></td>
+  </tr>
+</table>
+
+---
+
