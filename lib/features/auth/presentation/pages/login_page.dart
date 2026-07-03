@@ -108,7 +108,7 @@ Widget build(BuildContext context) {
     isLoading: isLoading,
     message: 'Masuk ke akun...',
     child: Scaffold(
-      backgroundColor: const Color(0xFFFFF3E6), // 🧡 soft orange background
+      backgroundColor: const Color(0xFFFFF3E6), 
 
       body: SafeArea(
         child: SingleChildScrollView(
@@ -134,8 +134,8 @@ Widget build(BuildContext context) {
                     ],
                   ),
                   child: const AuthHeader(
-                    icon: Icons.shopping_bag_outlined, // 👜 lebih cocok toko tas
-                    title: 'Halo, Fashion Lovers 🧡',
+                    icon: Icons.shopping_bag_outlined, 
+                    title: 'Halo, Fashion Lovers ',
                     subtitle: 'Yuk masuk ke toko tas lucu kamu',
                   ),
                 ),
