@@ -213,68 +213,97 @@ class _OrderCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header: order id + status chip
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Order #${order.id}',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: _kOrangeDark,
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: statusColor.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    _statusLabel(order.status),
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: statusColor,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 6),
-            // Tanggal
-            Text(
-              formatDate(order.createdAt),
-              style: TextStyle(
-                fontSize: 12,
-                color: onSurface.withValues(alpha: 0.5),
-              ),
-            ),
-            const Divider(height: 20, color: Color(0xFFF0F0F0)),
-            // Jumlah item + total
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '${order.items.length} item',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: onSurface.withValues(alpha: 0.7),
-                  ),
-                ),
-                Text(
-                  formatPrice(order.totalAmount),
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: _kOrangePrimary,
-                  ),
-                ),
-              ],
-            ),
+            // Header
+Row(
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: [
+    Text(
+      'Order #${order.id}',
+      style: const TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.bold,
+        color: _kOrangeDark,
+      ),
+    ),
+    Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: statusColor.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        _statusLabel(order.status),
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: statusColor,
+        ),
+      ),
+    ),
+  ],
+),
+
+const SizedBox(height: 6),
+
+Text(
+  formatDate(order.createdAt),
+  style: TextStyle(
+    fontSize: 12,
+    color: onSurface.withValues(alpha: 0.5),
+  ),
+),
+
+const Divider(height: 20),
+
+// Produk
+...order.items.map(
+  (item) => Padding(
+    padding: const EdgeInsets.only(bottom: 8),
+    child: Row(
+      children: [
+        const Icon(
+          Icons.shopping_bag_outlined,
+          size: 18,
+          color: _kOrangePrimary,
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+  item.productName,
+  style: const TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+  ),
+),
+        ),
+        Text("x${item.quantity}"),
+      ],
+    ),
+  ),
+),
+
+const Divider(height: 20),
+
+Row(
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: [
+    Text(
+      '${order.items.length} item',
+      style: TextStyle(
+        fontSize: 13,
+        color: onSurface.withValues(alpha: 0.7),
+      ),
+    ),
+    Text(
+      formatPrice(order.totalAmount),
+      style: const TextStyle(
+        fontSize: 15,
+        fontWeight: FontWeight.bold,
+        color: _kOrangePrimary,
+      ),
+    ),
+  ],
+),
           ],
         ),
       ),

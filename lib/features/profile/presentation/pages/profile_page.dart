@@ -15,24 +15,40 @@ class _Leaf {
   factory _Leaf.of(BuildContext context) =>
       _Leaf(Theme.of(context).brightness == Brightness.dark);
 
-  Color get bg => isDark ? const Color(0xFF121212) : const Color(0xFFF6F7F2);
+  // Background
+  Color get bg => isDark ? const Color(0xFF121212) : const Color(0xFFFFF7EF);
+
   Color get surface => isDark ? const Color(0xFF2C2C2C) : Colors.white;
+  // Border
+  Color get border =>
+    isDark ? const Color(0xFF4A3826) : const Color(0xFFFFE8D6);
+  // Text
+  Color get textPrimary =>
+      isDark ? const Color(0xFFEEEEEE) : const Color(0xFF3B2A20);
 
-  Color get border => isDark ? const Color(0xFF3A4A3A) : const Color(0xFFEDEFE8);
+  Color get textSecondary =>
+      isDark ? const Color(0xFFAAAAAA) : Colors.black54;
 
-  Color get textPrimary => isDark ? const Color(0xFFEEEEEE) : const Color(0xFF232323);
-  Color get textSecondary => isDark ? const Color(0xFFAAAAAA) : Colors.black54;
-  Color get textHint => isDark ? const Color(0xFF888888) : Colors.black38;
+  Color get textHint =>
+      isDark ? const Color(0xFF888888) : Colors.black38;
 
-  Color get green => const Color(0xFF3E9C4F);
-  Color get greenSoft => isDark ? const Color(0xFF25382A) : const Color(0xFFE7F5E9);
+  // Orange (sama seperti Dashboard)
+  Color get green => const Color(0xFFFF7A29);
 
-  Color get danger => const Color(0xFFE5484D);
-  Color get dangerSoft => isDark ? const Color(0xFF3A2323) : const Color(0xFFFCEBEC);
+  Color get greenSoft => isDark
+      ? const Color(0xFF3A2A1E)
+      : const Color(0xFFFFE8D6);
+
+  // Logout
+  Color get danger => const Color(0xFFE85D04);
+
+  Color get dangerSoft => isDark
+      ? const Color(0xFF3A2A1E)
+      : const Color(0xFFFFE8D6);
 
   Color get shadow => isDark
       ? Colors.black.withValues(alpha: 0.35)
-      : Colors.black.withValues(alpha: 0.05);
+      : const Color(0xFFFF7A29).withValues(alpha: 0.10);
 }
 
 class ProfilePage extends StatelessWidget {
@@ -272,9 +288,11 @@ class _LogoutButton extends StatelessWidget {
       width: double.infinity,
       child: OutlinedButton.icon(
         style: OutlinedButton.styleFrom(
-          backgroundColor: leaf.dangerSoft,
-          side: BorderSide(color: leaf.danger.withValues(alpha: 0.3)),
-          foregroundColor: leaf.danger,
+          backgroundColor: leaf.greenSoft,
+            side: BorderSide(
+              color: leaf.green.withValues(alpha: .25),
+            ),
+            foregroundColor: leaf.green,
           padding: const EdgeInsets.symmetric(vertical: 14),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
@@ -295,7 +313,7 @@ class _LogoutButton extends StatelessWidget {
   }
 }
 
-// ── Bottom Navigation (khusus tampilan halaman Profile) ─────
+// ── Bottom Navigation (Sama seperti Dashboard) ─────────────
 class _ProfileBottomNav extends StatelessWidget {
   final _Leaf leaf;
 
@@ -305,18 +323,21 @@ class _ProfileBottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     final cartItemCount = context.watch<CartProvider>().itemCount;
 
-    final items = <_NavEntry>[
-      const _NavEntry(icon: Icons.home_rounded, label: 'Home'),
-      const _NavEntry(icon: Icons.favorite_rounded, label: 'Wishlist'),
-      const _NavEntry(icon: Icons.shopping_bag_rounded, label: 'Cart'),
-      const _NavEntry(icon: Icons.person_rounded, label: 'Profile'),
+    const items = [
+      _NavEntry(icon: Icons.home_rounded, label: 'Home'),
+      _NavEntry(icon: Icons.shopping_bag_rounded, label: 'Cart'),
+      _NavEntry(icon: Icons.favorite_rounded, label: 'Favorite'),
+      _NavEntry(icon: Icons.person_rounded, label: 'Account'),
     ];
-    const selectedIndex = 3; // Profile aktif
+
+    const selectedIndex = 3;
 
     return Container(
       decoration: BoxDecoration(
         color: leaf.surface,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(28),
+        ),
         boxShadow: [
           BoxShadow(
             color: leaf.shadow,
@@ -333,54 +354,84 @@ class _ProfileBottomNav extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: List.generate(items.length, (i) {
               final selected = i == selectedIndex;
-              final isCart = i == 2;
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        Icon(
-                          items[i].icon,
-                          size: 22,
-                          color: selected ? leaf.green : leaf.textHint,
+              final isCart = i == 1;
+
+              return GestureDetector(
+                onTap: () {
+                  if (i == 0) {
+                    Navigator.pop(context);
+                  } else if (i == 1) {
+                    Navigator.pushNamed(context, AppRouter.cart);
+                  }
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 4,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: selected
+                              ? const Color(0xFFFFE8D6)
+                              : Colors.transparent,
+                          shape: BoxShape.circle,
                         ),
-                        if (isCart && cartItemCount > 0)
-                          Positioned(
-                            right: -6,
-                            top: -6,
-                            child: Container(
-                              width: 16,
-                              height: 16,
-                              decoration: const BoxDecoration(
-                                color: Color(0xFFE5484D),
-                                shape: BoxShape.circle,
-                              ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                cartItemCount > 99 ? '99+' : '$cartItemCount',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.bold,
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Icon(
+                              items[i].icon,
+                              size: 22,
+                              color: selected
+                                  ? const Color(0xFFE85D04)
+                                  : leaf.textHint,
+                            ),
+                            if (isCart && cartItemCount > 0)
+                              Positioned(
+                                right: -6,
+                                top: -6,
+                                child: Container(
+                                  width: 16,
+                                  height: 16,
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFFE85D04),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    cartItemCount > 99
+                                        ? '99+'
+                                        : '$cartItemCount',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      items[i].label,
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: selected ? FontWeight.w700 : FontWeight.normal,
-                        color: selected ? leaf.green : leaf.textHint,
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 2),
+                      Text(
+                        items[i].label,
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: selected
+                              ? FontWeight.w700
+                              : FontWeight.normal,
+                          color: selected
+                              ? const Color(0xFFE85D04)
+                              : leaf.textHint,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               );
             }),
@@ -394,5 +445,9 @@ class _ProfileBottomNav extends StatelessWidget {
 class _NavEntry {
   final IconData icon;
   final String label;
-  const _NavEntry({required this.icon, required this.label});
+
+  const _NavEntry({
+    required this.icon,
+    required this.label,
+  });
 }

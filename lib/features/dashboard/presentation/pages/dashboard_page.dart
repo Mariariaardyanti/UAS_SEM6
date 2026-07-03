@@ -353,117 +353,37 @@ class _SearchBar extends StatelessWidget {
 }
 
 // ── Banner Card Widget ─────────────────────────────────────
+// ── Banner Card Widget ─────────────────────────────────────
 class _BannerCard extends StatelessWidget {
-  const _BannerCard();
+  const _BannerCard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final cute = _Cute.of(context);
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: SizedBox(
+        height: 200,
+        width: double.infinity,
+        child: Image.network(
+          "https://i.ibb.co.com/HDDrPZQW/82bc395f-954b-4c0f-a201-d934ac4a42da.png", 
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) return child;
 
-    return Container(
-      height: 160,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        gradient: LinearGradient(
-          colors: cute.isDark
-              ? const [Color(0xFFB84600), Color(0xFFE07A2E)]
-              : [const Color(0xFFE85D04), cute.orangeSoft],
-          begin: Alignment.centerLeft,
-          end: Alignment.centerRight,
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          },
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              color: Colors.grey.shade200,
+              alignment: Alignment.center,
+              child: const Icon(
+                Icons.broken_image,
+                size: 50,
+              ),
+            );
+          },
         ),
-      ),
-      child: Stack(
-        children: [
-          // Lingkaran dekorasi background
-          Positioned(
-            right: 130,
-            top: -20,
-            child: Container(
-              width: 140,
-              height: 140,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.10),
-              ),
-            ),
-          ),
-          Positioned(
-            right: 40,
-            bottom: -30,
-            child: Container(
-              width: 90,
-              height: 90,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: cute.yellowAccent.withValues(alpha: 0.25),
-              ),
-            ),
-          ),
-          // Teks dan tombol
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  '✨ Koleksi Baru!',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'Diskon hingga 50%\nuntuk transaksi pertamamu',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 12,
-                    height: 1.4,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                GestureDetector(
-                  onTap: () {},
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      'BELANJA YUK!',
-                      style: TextStyle(
-                        color: cute.isDark ? const Color(0xFFB84600) : const Color(0xFFE85D04),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          // Gambar sepatu placeholder
-          Positioned(
-            right: 0,
-            bottom: 0,
-            top: 0,
-            child: ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topRight: Radius.circular(24),
-                bottomRight: Radius.circular(24),
-              ),
-              child: Container(
-                width: 160,
-                alignment: Alignment.center,
-                child: const Text('🏃', style: TextStyle(fontSize: 70)),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
