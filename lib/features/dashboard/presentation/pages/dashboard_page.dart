@@ -8,6 +8,40 @@ import 'package:pasar_malam/features/dashboard/presentation/providers/product_pr
 import 'package:pasar_malam/features/order/presentation/providers/order_provider.dart';
 import 'package:provider/provider.dart';
 
+// ── Palet oren gemas, otomatis nyesuain terang/gelap ───────
+class _Cute {
+  final bool isDark;
+  const _Cute(this.isDark);
+
+  factory _Cute.of(BuildContext context) =>
+      _Cute(Theme.of(context).brightness == Brightness.dark);
+
+  // Latar
+  Color get bg => isDark ? const Color(0xFF121212) : const Color(0xFFFFF7EF);
+  Color get surface => isDark ? const Color(0xFF2C2C2C) : Colors.white;
+  Color get surfaceAlt => isDark ? const Color(0xFF1E1E1E) : Colors.white;
+
+  // Aksen lembut (badge, border kartu, dsb)
+  Color get peach => isDark ? const Color(0xFF3A2A1E) : const Color(0xFFFFE8D6);
+  Color get border => isDark ? const Color(0xFF4A3826) : const Color(0xFFFFE8D6);
+
+  // Teks
+  Color get textPrimary => isDark ? const Color(0xFFEEEEEE) : const Color(0xFF3B2A20);
+  Color get textSecondary => isDark ? const Color(0xFFAAAAAA) : Colors.black54;
+  Color get textHint => isDark ? const Color(0xFF888888) : Colors.black38;
+
+  // Oren utama — tetap konsisten di dua mode biar brand-nya kebaca
+  Color get orange => const Color(0xFFFF7A29);
+  Color get orangeSoft => const Color(0xFFFFA351);
+  // Sedikit dicerahkan di dark biar kontras enak di atas latar gelap
+  Color get orangeDeep => isDark ? const Color(0xFFFFA35C) : const Color(0xFFE85D04);
+  Color get yellowAccent => const Color(0xFFFFC15E);
+
+  Color get shadow => isDark
+      ? Colors.black.withValues(alpha: 0.35)
+      : const Color(0xFFFF7A29).withValues(alpha: 0.10);
+}
+
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
 
@@ -21,13 +55,13 @@ class _DashboardPageState extends State<DashboardPage> {
   final _searchCtrl = TextEditingController();
 
   final List<_CategoryItem> _categories = const [
-    _CategoryItem(label: 'All', icon: Icons.apps),
-    _CategoryItem(label: 'Running', icon: Icons.directions_run),
-    _CategoryItem(label: 'Lifestyle', icon: Icons.style),
-    _CategoryItem(label: 'Football', icon: Icons.sports_soccer),
-    _CategoryItem(label: 'Volleyball', icon: Icons.sports_volleyball),
-    _CategoryItem(label: 'Tennis', icon: Icons.sports_tennis),
-    _CategoryItem(label: 'Badminton', icon: Icons.sports),
+    _CategoryItem(label: 'All', icon: Icons.apps_rounded),
+    _CategoryItem(label: 'Running', icon: Icons.directions_run_rounded),
+    _CategoryItem(label: 'Lifestyle', icon: Icons.style_rounded),
+    _CategoryItem(label: 'Football', icon: Icons.sports_soccer_rounded),
+    _CategoryItem(label: 'Volleyball', icon: Icons.sports_volleyball_rounded),
+    _CategoryItem(label: 'Tennis', icon: Icons.sports_tennis_rounded),
+    _CategoryItem(label: 'Badminton', icon: Icons.sports_rounded),
   ];
 
   @override
@@ -73,18 +107,20 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
     final productProv = context.watch<ProductProvider>();
+    final cute = _Cute.of(context);
 
     // ignore: unused_local_variable
     final _ = context.watch<OrderProvider>();
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: cute.bg,
       body: SafeArea(
         child: Column(
           children: [
             // ── Body scroll ─────────────────────────────────
             Expanded(
               child: RefreshIndicator(
+                color: cute.orange,
                 onRefresh: () => productProv.fetchProducts(),
                 child: CustomScrollView(
                   slivers: [
@@ -111,21 +147,21 @@ class _DashboardPageState extends State<DashboardPage> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
-                              'Categories',
+                            Text(
+                              'Kategori',
                               style: TextStyle(
                                 fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF1A1A2E),
+                                fontWeight: FontWeight.w800,
+                                color: cute.textPrimary,
                               ),
                             ),
                             TextButton(
                               onPressed: () {},
-                              child: const Text(
-                                'See All',
+                              child: Text(
+                                'Lihat Semua',
                                 style: TextStyle(
-                                  color: Color(0xFF1565C0),
-                                  fontWeight: FontWeight.w600,
+                                  color: cute.orangeDeep,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
                             ),
@@ -155,15 +191,15 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
 
                     // ── For You label ─────────────────────
-                    const SliverToBoxAdapter(
+                    SliverToBoxAdapter(
                       child: Padding(
-                        padding: EdgeInsets.fromLTRB(16, 24, 16, 12),
+                        padding: const EdgeInsets.fromLTRB(16, 24, 16, 12),
                         child: Text(
-                          'For you',
+                          'Buat Kamu',
                           style: TextStyle(
                             fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF1A1A2E),
+                            fontWeight: FontWeight.w800,
+                            color: cute.textPrimary,
                           ),
                         ),
                       ),
@@ -172,20 +208,36 @@ class _DashboardPageState extends State<DashboardPage> {
                     // ── Product Grid ──────────────────────
                     switch (productProv.status) {
                       ProductStatus.loading || ProductStatus.initial =>
-                        const SliverFillRemaining(
-                          child: Center(child: CircularProgressIndicator()),
+                        SliverFillRemaining(
+                          child: Center(
+                            child: CircularProgressIndicator(color: cute.orange),
+                          ),
                         ),
                       ProductStatus.error => SliverFillRemaining(
                           child: Center(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                const Icon(Icons.error_outline, size: 48, color: Colors.red),
                                 const SizedBox(height: 12),
-                                Text(productProv.error ?? 'Terjadi kesalahan'),
+                                Text(
+                                  productProv.error ?? 'Aduh, ada yang salah nih',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: cute.textPrimary,
+                                  ),
+                                ),
                                 const SizedBox(height: 16),
                                 ElevatedButton.icon(
-                                  icon: const Icon(Icons.refresh),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: cute.orange,
+                                    foregroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20, vertical: 12),
+                                  ),
+                                  icon: const Icon(Icons.refresh_rounded),
                                   label: const Text('Coba Lagi'),
                                   onPressed: () => productProv.fetchProducts(),
                                 ),
@@ -196,9 +248,12 @@ class _DashboardPageState extends State<DashboardPage> {
                       ProductStatus.loaded => () {
                           final items = _filteredProducts(productProv.products);
                           if (items.isEmpty) {
-                            return const SliverFillRemaining(
+                            return SliverFillRemaining(
                               child: Center(
-                                child: Text('Tidak ada produk ditemukan'),
+                                child: Text(
+                                  '🔍 Produk tidak ditemukan',
+                                  style: TextStyle(color: cute.textPrimary),
+                                ),
                               ),
                             );
                           }
@@ -271,17 +326,17 @@ class _SearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final surface = Theme.of(context).colorScheme.surface;
-    final hintColor = Theme.of(context).hintColor;
+    final cute = _Cute.of(context);
 
     return Container(
       height: 48,
       decoration: BoxDecoration(
-        color: surface,
-        borderRadius: BorderRadius.circular(14),
+        color: cute.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: cute.border, width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
+            color: cute.shadow,
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -290,10 +345,11 @@ class _SearchBar extends StatelessWidget {
       child: TextField(
         controller: controller,
         onChanged: onChanged,
+        style: TextStyle(color: cute.textPrimary),
         decoration: InputDecoration(
-          hintText: 'Puma, Running, Training...',
-          hintStyle: TextStyle(color: hintColor, fontSize: 14),
-          prefixIcon: Icon(Icons.search, color: hintColor, size: 22),
+          hintText: 'Cari Tas favoritmu... ',
+          hintStyle: TextStyle(color: cute.textHint, fontSize: 14),
+          prefixIcon: Icon(Icons.search_rounded, color: cute.orange, size: 22),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 13),
         ),
@@ -308,12 +364,16 @@ class _BannerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cute = _Cute.of(context);
+
     return Container(
       height: 160,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1565C0), Color(0xFF42A5F5)],
+        borderRadius: BorderRadius.circular(24),
+        gradient: LinearGradient(
+          colors: cute.isDark
+              ? const [Color(0xFFB84600), Color(0xFFE07A2E)]
+              : [const Color(0xFFE85D04), cute.orangeSoft],
           begin: Alignment.centerLeft,
           end: Alignment.centerRight,
         ),
@@ -329,7 +389,19 @@ class _BannerCard extends StatelessWidget {
               height: 140,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.08),
+                color: Colors.white.withValues(alpha: 0.10),
+              ),
+            ),
+          ),
+          Positioned(
+            right: 40,
+            bottom: -30,
+            child: Container(
+              width: 90,
+              height: 90,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: cute.yellowAccent.withValues(alpha: 0.25),
               ),
             ),
           ),
@@ -341,16 +413,16 @@ class _BannerCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text(
-                  'New Collections!',
+                  '✨ Koleksi Baru!',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
                 const SizedBox(height: 4),
                 const Text(
-                  'Get Discount up to 50%\nfor the first transaction',
+                  'Diskon hingga 50%\nuntuk transaksi pertamamu',
                   style: TextStyle(
                     color: Colors.white70,
                     fontSize: 12,
@@ -363,15 +435,15 @@ class _BannerCard extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: Colors.black87,
-                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    child: const Text(
-                      'SHOP NOW!',
+                    child: Text(
+                      'BELANJA YUK!',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: cute.isDark ? const Color(0xFFB84600) : const Color(0xFFE85D04),
                         fontSize: 12,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w800,
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -387,17 +459,13 @@ class _BannerCard extends StatelessWidget {
             top: 0,
             child: ClipRRect(
               borderRadius: const BorderRadius.only(
-                topRight: Radius.circular(20),
-                bottomRight: Radius.circular(20),
+                topRight: Radius.circular(24),
+                bottomRight: Radius.circular(24),
               ),
               child: Container(
                 width: 160,
                 alignment: Alignment.center,
-                child: const Icon(
-                  Icons.directions_run,
-                  size: 80,
-                  color: Colors.white24,
-                ),
+                child: const Text('🏃', style: TextStyle(fontSize: 70)),
               ),
             ),
           ),
@@ -421,23 +489,29 @@ class _CategoryChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cute = _Cute.of(context);
+
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: selected
-              ? const Color(0xFF1565C0)
-              : Theme.of(context).colorScheme.surface,
+          color: selected ? cute.orange : cute.surface,
           borderRadius: BorderRadius.circular(22),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          border: Border.all(
+            color: selected ? cute.orange : cute.border,
+            width: 1.5,
+          ),
+          boxShadow: selected
+              ? [
+                  BoxShadow(
+                    color: cute.orange.withValues(alpha: 0.25),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ]
+              : [],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -445,19 +519,15 @@ class _CategoryChip extends StatelessWidget {
             Icon(
               item.icon,
               size: 16,
-              color: selected
-                  ? Colors.white
-                  : Theme.of(context).colorScheme.onSurface,
+              color: selected ? Colors.white : cute.orangeDeep,
             ),
             const SizedBox(width: 6),
             Text(
               item.label,
               style: TextStyle(
                 fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: selected
-                    ? Colors.white
-                    : Theme.of(context).colorScheme.onSurface,
+                fontWeight: FontWeight.w600,
+                color: selected ? Colors.white : cute.textPrimary,
               ),
             ),
           ],
@@ -486,7 +556,7 @@ class _ProductCardState extends State<_ProductCard> {
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
       builder: (_) => _ProductDetailSheet(
         product: widget.product,
@@ -498,18 +568,18 @@ class _ProductCardState extends State<_ProductCard> {
   @override
   Widget build(BuildContext context) {
     final p = widget.product;
-    final surface = Theme.of(context).colorScheme.surface;
-    final onSurface = Theme.of(context).colorScheme.onSurface;
+    final cute = _Cute.of(context);
 
     return GestureDetector(
       onTap: () => _showProductDetail(context),
       child: Container(
         decoration: BoxDecoration(
-          color: surface,
-          borderRadius: BorderRadius.circular(16),
+          color: cute.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: cute.border, width: 1.5),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
+              color: cute.shadow,
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -525,7 +595,7 @@ class _ProductCardState extends State<_ProductCard> {
                 children: [
                   ClipRRect(
                     borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(16),
+                      top: Radius.circular(19),
                     ),
                     child: p.imageUrl.isNotEmpty
                         ? Image.network(
@@ -533,9 +603,9 @@ class _ProductCardState extends State<_ProductCard> {
                             width: double.infinity,
                             height: double.infinity,
                             fit: BoxFit.cover,
-                            errorBuilder: (ctx, err, stack) => _imagePlaceholder(),
+                            errorBuilder: (ctx, err, stack) => _imagePlaceholder(cute),
                           )
-                        : _imagePlaceholder(),
+                        : _imagePlaceholder(cute),
                   ),
                   // Heart button
                   Positioned(
@@ -546,19 +616,19 @@ class _ProductCardState extends State<_ProductCard> {
                       child: Container(
                         padding: const EdgeInsets.all(6),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: cute.surface,
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.08),
+                              color: Colors.black.withValues(alpha: 0.15),
                               blurRadius: 4,
                             ),
                           ],
                         ),
                         child: Icon(
-                          _isFavorite ? Icons.favorite : Icons.favorite_border,
+                          _isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
                           size: 16,
-                          color: _isFavorite ? Colors.red : Colors.grey,
+                          color: _isFavorite ? cute.orangeDeep : cute.textHint,
                         ),
                       ),
                     ),
@@ -576,23 +646,31 @@ class _ProductCardState extends State<_ProductCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Kategori
-                    Text(
-                      p.category,
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: onSurface.withValues(alpha: 0.5),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: cute.peach,
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      child: Text(
+                        p.category,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: cute.orangeDeep,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 4),
                     // Nama produk
                     Text(
                       p.name,
                       style: TextStyle(
                         fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: onSurface,
+                        fontWeight: FontWeight.w800,
+                        color: cute.textPrimary,
                         height: 1.3,
                       ),
                       maxLines: 2,
@@ -605,15 +683,15 @@ class _ProductCardState extends State<_ProductCard> {
                         ...List.generate(
                           5,
                           (i) => Icon(
-                            i < 4 ? Icons.star : Icons.star_half,
-                            size: 12,
-                            color: const Color(0xFFFFC107),
+                            i < 4 ? Icons.star_rounded : Icons.star_half_rounded,
+                            size: 13,
+                            color: cute.yellowAccent,
                           ),
                         ),
                         const SizedBox(width: 4),
-                        const Text(
+                        Text(
                           '4.6',
-                          style: TextStyle(fontSize: 11, color: Colors.grey),
+                          style: TextStyle(fontSize: 11, color: cute.textSecondary),
                         ),
                       ],
                     ),
@@ -621,10 +699,10 @@ class _ProductCardState extends State<_ProductCard> {
                     // Harga
                     Text(
                       widget.formatPrice(p.price),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF1565C0),
+                        fontWeight: FontWeight.w800,
+                        color: cute.orangeDeep,
                       ),
                     ),
                   ],
@@ -637,16 +715,12 @@ class _ProductCardState extends State<_ProductCard> {
     );
   }
 
-  Widget _imagePlaceholder() => Builder(
-        builder: (context) => Container(
-          width: double.infinity,
-          height: double.infinity,
-          color: Theme.of(context).colorScheme.surfaceContainerHighest,
-          child: Icon(
-            Icons.image_outlined,
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
-            size: 40,
-          ),
+  Widget _imagePlaceholder(_Cute cute) => Container(
+        width: double.infinity,
+        height: double.infinity,
+        color: cute.peach,
+        child: const Center(
+          child: Text('🍡', style: TextStyle(fontSize: 32)),
         ),
       );
 }
@@ -671,10 +745,8 @@ class _ProductDetailSheetState extends State<_ProductDetailSheet> {
   @override
   Widget build(BuildContext context) {
     final p = widget.product;
-    final primary = Theme.of(context).colorScheme.primary;
-    final onSurface = Theme.of(context).colorScheme.onSurface;
-    final surface = Theme.of(context).colorScheme.surface;
     final cartProv = context.watch<CartProvider>();
+    final cute = _Cute.of(context);
 
     return DraggableScrollableSheet(
       expand: false,
@@ -683,19 +755,19 @@ class _ProductDetailSheetState extends State<_ProductDetailSheet> {
       maxChildSize: 0.95,
       builder: (_, scrollCtrl) => Container(
         decoration: BoxDecoration(
-          color: surface,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          color: cute.bg,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: Column(
           children: [
             // Drag handle
             Container(
               margin: const EdgeInsets.only(top: 12),
-              width: 40,
-              height: 4,
+              width: 44,
+              height: 5,
               decoration: BoxDecoration(
-                color: onSurface.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(2),
+                color: cute.peach,
+                borderRadius: BorderRadius.circular(3),
               ),
             ),
             Expanded(
@@ -705,54 +777,54 @@ class _ProductDetailSheetState extends State<_ProductDetailSheet> {
                 children: [
                   // Gambar produk
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: p.imageUrl.isNotEmpty
-                        ? Image.network(
-                            p.imageUrl,
-                            height: 200,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                            errorBuilder: (ctx, err, stack) => Container(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: cute.border, width: 2),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: p.imageUrl.isNotEmpty
+                          ? Image.network(
+                              p.imageUrl,
                               height: 200,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .surfaceContainerHighest,
-                              child: Icon(
-                                Icons.image_outlined,
-                                color: onSurface.withValues(alpha: 0.2),
-                                size: 48,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                              errorBuilder: (ctx, err, stack) => Container(
+                                height: 200,
+                                color: cute.peach,
                               ),
+                            )
+                          : Container(
+                              height: 200,
+                              color: cute.peach,
                             ),
-                          )
-                        : Container(
-                            height: 200,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .surfaceContainerHighest,
-                            child: Icon(
-                              Icons.image_outlined,
-                              color: onSurface.withValues(alpha: 0.2),
-                              size: 48,
-                            ),
-                          ),
+                    ),
                   ),
                   const SizedBox(height: 16),
                   // Kategori
-                  Text(
-                    p.category,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: onSurface.withValues(alpha: 0.5),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: cute.peach,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      p.category,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: cute.orangeDeep,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 8),
                   // Nama
                   Text(
                     p.name,
                     style: TextStyle(
                       fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: onSurface,
+                      fontWeight: FontWeight.w800,
+                      color: cute.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -761,8 +833,8 @@ class _ProductDetailSheetState extends State<_ProductDetailSheet> {
                     widget.formatPrice(p.price),
                     style: TextStyle(
                       fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: primary,
+                      fontWeight: FontWeight.w800,
+                      color: cute.orangeDeep,
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -771,7 +843,7 @@ class _ProductDetailSheetState extends State<_ProductDetailSheet> {
                     p.description,
                     style: TextStyle(
                       fontSize: 13,
-                      color: onSurface.withValues(alpha: 0.7),
+                      color: cute.textSecondary,
                       height: 1.5,
                     ),
                   ),
@@ -785,13 +857,13 @@ class _ProductDetailSheetState extends State<_ProductDetailSheet> {
                           if (_qty > 1) setState(() => _qty--);
                         },
                         child: Container(
-                          width: 36,
-                          height: 36,
+                          width: 38,
+                          height: 38,
                           decoration: BoxDecoration(
-                            color: primary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(10),
+                            color: cute.orange,
+                            shape: BoxShape.circle,
                           ),
-                          child: Icon(Icons.remove, size: 18, color: primary),
+                          child: const Icon(Icons.remove_rounded, size: 18, color: Colors.white),
                         ),
                       ),
                       Padding(
@@ -800,21 +872,21 @@ class _ProductDetailSheetState extends State<_ProductDetailSheet> {
                           '$_qty',
                           style: TextStyle(
                             fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: onSurface,
+                            fontWeight: FontWeight.w800,
+                            color: cute.textPrimary,
                           ),
                         ),
                       ),
                       GestureDetector(
                         onTap: () => setState(() => _qty++),
                         child: Container(
-                          width: 36,
-                          height: 36,
+                          width: 38,
+                          height: 38,
                           decoration: BoxDecoration(
-                            color: primary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(10),
+                            color: cute.orange,
+                            shape: BoxShape.circle,
                           ),
-                          child: Icon(Icons.add, size: 18, color: primary),
+                          child: const Icon(Icons.add_rounded, size: 18, color: Colors.white),
                         ),
                       ),
                     ],
@@ -830,12 +902,14 @@ class _ProductDetailSheetState extends State<_ProductDetailSheet> {
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: primary,
+                    backgroundColor: cute.orange,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(24),
                     ),
+                    elevation: 3,
+                    shadowColor: cute.orange.withValues(alpha: 0.5),
                   ),
                   icon: cartProv.isAdding
                       ? const SizedBox(
@@ -846,12 +920,12 @@ class _ProductDetailSheetState extends State<_ProductDetailSheet> {
                             color: Colors.white,
                           ),
                         )
-                      : const Icon(Icons.shopping_cart_outlined),
+                      : const Text('', style: TextStyle(fontSize: 16)),
                   label: Text(
                     cartProv.isAdding ? 'Menambahkan...' : 'Tambah ke Keranjang',
                     style: const TextStyle(
                       fontSize: 15,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
                   onPressed: cartProv.isAdding
@@ -866,10 +940,15 @@ class _ProductDetailSheetState extends State<_ProductDetailSheet> {
                             SnackBar(
                               content: Text(
                                 success
-                                    ? '${p.name} ditambahkan ke keranjang'
+                                    ? '${p.name} ditambahkan ke keranjang 🎉'
                                     : 'Gagal menambahkan ke keranjang',
                               ),
-                              backgroundColor: success ? Colors.green : Colors.red,
+                              backgroundColor:
+                                  success ? cute.orangeDeep : Colors.red,
+                              behavior: SnackBarBehavior.floating,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
                               duration: const Duration(seconds: 2),
                             ),
                           );
@@ -895,24 +974,23 @@ class _BottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     const items = [
       _NavItem(icon: Icons.home_rounded, label: 'Home'),
-      _NavItem(icon: Icons.shopping_bag_outlined, label: 'Cart'),
-      _NavItem(icon: Icons.favorite_border, label: 'Favorite'),
-      _NavItem(icon: Icons.person_outline, label: 'Account'),
+      _NavItem(icon: Icons.shopping_bag_rounded, label: 'Cart'),
+      _NavItem(icon: Icons.favorite_rounded, label: 'Favorite'),
+      _NavItem(icon: Icons.person_rounded, label: 'Account'),
     ];
 
-    final surface = Theme.of(context).colorScheme.surface;
-    final primary = Theme.of(context).colorScheme.primary;
-    final unselectedColor = Theme.of(context).unselectedWidgetColor;
     final cartItemCount = context.watch<CartProvider>().itemCount;
+    final cute = _Cute.of(context);
 
     return Container(
       decoration: BoxDecoration(
-        color: surface,
+        color: cute.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 12,
-            offset: const Offset(0, -2),
+            color: cute.shadow,
+            blurRadius: 16,
+            offset: const Offset(0, -4),
           ),
         ],
       ),
@@ -933,47 +1011,54 @@ class _BottomNav extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          Icon(
-                            items[i].icon,
-                            size: 24,
-                            color: selected ? primary : unselectedColor,
-                          ),
-                          if (isCart && cartItemCount > 0)
-                            Positioned(
-                              right: -6,
-                              top: -6,
-                              child: Container(
-                                width: 16,
-                                height: 16,
-                                decoration: const BoxDecoration(
-                                  color: Colors.red,
-                                  shape: BoxShape.circle,
-                                ),
-                                alignment: Alignment.center,
-                                child: Text(
-                                  cartItemCount > 99
-                                      ? '99+'
-                                      : '$cartItemCount',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.bold,
+                      Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: selected ? cute.peach : Colors.transparent,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Icon(
+                              items[i].icon,
+                              size: 22,
+                              color: selected ? cute.orangeDeep : cute.textHint,
+                            ),
+                            if (isCart && cartItemCount > 0)
+                              Positioned(
+                                right: -6,
+                                top: -6,
+                                child: Container(
+                                  width: 16,
+                                  height: 16,
+                                  decoration: BoxDecoration(
+                                    color: cute.orangeDeep,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Text(
+                                    cartItemCount > 99
+                                        ? '99+'
+                                        : '$cartItemCount',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                        ],
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 2),
                       Text(
                         items[i].label,
                         style: TextStyle(
                           fontSize: 11,
-                          fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
-                          color: selected ? primary : unselectedColor,
+                          fontWeight: selected ? FontWeight.w700 : FontWeight.normal,
+                          color: selected ? cute.orangeDeep : cute.textHint,
                         ),
                       ),
                     ],
@@ -1011,16 +1096,22 @@ class _AccountDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = context.watch<ThemeProvider>();
     final isDark = themeProvider.isDark;
+    final cute = _Cute.of(context);
 
     return AlertDialog(
-      title: const Text('Akun'),
+      backgroundColor: cute.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      title: Text(
+        'Akun',
+        style: TextStyle(fontWeight: FontWeight.w800, color: cute.textPrimary),
+      ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           // Avatar
           CircleAvatar(
             radius: 30,
-            backgroundColor: const Color(0xFF1565C0),
+            backgroundColor: cute.orange,
             child: Text(
               (auth.firebaseUser?.displayName ?? 'U')[0].toUpperCase(),
               style: const TextStyle(fontSize: 24, color: Colors.white),
@@ -1029,14 +1120,18 @@ class _AccountDialog extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             auth.firebaseUser?.displayName ?? 'User',
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            style: TextStyle(
+              fontWeight: FontWeight.w800,
+              fontSize: 16,
+              color: cute.textPrimary,
+            ),
           ),
           Text(
             auth.firebaseUser?.email ?? '',
-            style: const TextStyle(color: Colors.grey, fontSize: 13),
+            style: TextStyle(color: cute.textSecondary, fontSize: 13),
           ),
           const SizedBox(height: 20),
-          const Divider(),
+          Divider(color: cute.border),
           const SizedBox(height: 4),
 
           // Dark mode toggle row
@@ -1046,19 +1141,20 @@ class _AccountDialog extends StatelessWidget {
               Row(
                 children: [
                   Icon(
-                    isDark ? Icons.dark_mode : Icons.light_mode,
+                    isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
                     size: 20,
-                    color: isDark ? Colors.amber : Colors.grey.shade600,
+                    color: isDark ? cute.yellowAccent : Colors.grey.shade600,
                   ),
                   const SizedBox(width: 10),
                   Text(
                     isDark ? 'Mode Gelap' : 'Mode Terang',
-                    style: const TextStyle(fontSize: 14),
+                    style: TextStyle(fontSize: 14, color: cute.textPrimary),
                   ),
                 ],
               ),
               Switch(
                 value: isDark,
+                activeColor: cute.orange,
                 onChanged: (_) => context.read<ThemeProvider>().toggle(),
               ),
             ],
@@ -1068,12 +1164,17 @@ class _AccountDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
+          style: TextButton.styleFrom(foregroundColor: cute.orangeDeep),
           child: const Text('Tutup'),
         ),
         ElevatedButton.icon(
-          icon: const Icon(Icons.logout, size: 18),
+          icon: const Icon(Icons.logout_rounded, size: 18),
           label: const Text('Logout'),
-          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.redAccent,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          ),
           onPressed: () async {
             Navigator.pop(context);
             await auth.logout();
