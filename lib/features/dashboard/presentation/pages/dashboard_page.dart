@@ -940,7 +940,7 @@ class _ProductDetailSheetState extends State<_ProductDetailSheet> {
                             SnackBar(
                               content: Text(
                                 success
-                                    ? '${p.name} ditambahkan ke keranjang 🎉'
+                                    ? '${p.name} ditambahkan ke keranjang'
                                     : 'Gagal menambahkan ke keranjang',
                               ),
                               backgroundColor:

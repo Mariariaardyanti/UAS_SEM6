@@ -6,6 +6,12 @@ import 'package:provider/provider.dart';
 
 void _log(String msg) => debugPrint('[PasarMalam/Checkout] $msg');
 
+// ── Orange theme accents (UI only) ─────────────────────────
+const Color _kOrangePrimary = Color(0xFFFF7A00);
+const Color _kOrangeDark = Color(0xFFE65100);
+const Color _kOrangeSoft = Color(0xFFFFF3E8);
+const Color _kBg = Color(0xFFFAFAFA);
+
 class CheckoutPage extends StatefulWidget {
  const CheckoutPage({super.key});
 
@@ -21,25 +27,25 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
  static const List<_PaymentOption> _paymentOptions = [
  _PaymentOption(
- value: 'global_institute_pay',
- label: 'Global Institute Pay',
- subtitle: 'Bayar via Dompet Kampus Global',
- icon: Icons.school_rounded,
- iconColor: Color(0xFF1A237E),
- ),
- _PaymentOption(
  value: 'bank_transfer',
  label: 'Transfer Bank',
  subtitle: 'BCA, Mandiri, BNI, BRI',
- icon: Icons.account_balance,
- iconColor: Color(0xFF1565C0),
+ icon: Icons.account_balance_rounded,
+ iconColor: _kOrangeDark,
  ),
  _PaymentOption(
  value: 'virtual_account',
  label: 'Virtual Account',
  subtitle: 'Nomor VA otomatis digenerate',
- icon: Icons.credit_card,
- iconColor: Color(0xFFE65100),
+ icon: Icons.credit_card_rounded,
+ iconColor: Color(0xFFFF9800),
+ ),
+ _PaymentOption(
+ value: 'global_institute_pay',
+ label: 'Global Institute Pay',
+ subtitle: 'Bayar via Dompet Kampus Global',
+ icon: Icons.school_rounded,
+ iconColor: _kOrangePrimary,
  ),
  ];
 
@@ -81,7 +87,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
  showDialog(
  context: context,
  barrierDismissible: false,
- builder: (_) => const Center(child: CircularProgressIndicator()),
+ builder: (_) => const Center(
+ child: CircularProgressIndicator(color: _kOrangePrimary),
+ ),
  );
 
  _log('─── _placeOrder ───');
@@ -157,11 +165,18 @@ class _CheckoutPageState extends State<CheckoutPage> {
  final cartProv = context.watch<CartProvider>();
  final cart = cartProv.cart;
  final onSurface = Theme.of(context).colorScheme.onSurface;
- final surface = Theme.of(context).colorScheme.surface;
- final primary = Theme.of(context).colorScheme.primary;
 
  return Scaffold(
- appBar: AppBar(title: const Text('Checkout')),
+ backgroundColor: _kBg,
+ appBar: AppBar(
+ title: const Text(
+ 'Checkout',
+ style: TextStyle(fontWeight: FontWeight.w700, color: Colors.white),
+ ),
+ backgroundColor: _kOrangePrimary,
+ foregroundColor: Colors.white,
+ elevation: 0,
+ ),
  body: Form(
  key: _formKey,
  child: SingleChildScrollView(
@@ -174,13 +189,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
  const SizedBox(height: 8),
  Container(
  decoration: BoxDecoration(
- color: surface,
- borderRadius: BorderRadius.circular(12),
+ color: Colors.white,
+ borderRadius: BorderRadius.circular(16),
+ border: Border.all(color: const Color(0xFFF0F0F0)),
  boxShadow: [
  BoxShadow(
- color: Colors.black.withValues(alpha: 0.05),
- blurRadius: 6,
- offset: const Offset(0, 2),
+ color: _kOrangePrimary.withValues(alpha: 0.06),
+ blurRadius: 10,
+ offset: const Offset(0, 4),
  ),
  ],
  ),
@@ -230,9 +246,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
  ),
  ),
  ),
- const Divider(height: 1),
+ const Divider(height: 1, color: Color(0xFFF0F0F0)),
  ],
- Padding(
+ Container(
+ decoration: const BoxDecoration(
+ color: _kOrangeSoft,
+ borderRadius: BorderRadius.vertical(
+ bottom: Radius.circular(16),
+ ),
+ ),
  padding: const EdgeInsets.all(16),
  child: Row(
  mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -242,14 +264,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
  style: TextStyle(
  fontSize: 15,
  fontWeight: FontWeight.bold,
+ color: _kOrangeDark,
  ),
  ),
  Text(
  _formatPrice(cart?.total ?? 0),
- style: TextStyle(
- fontSize: 16,
+ style: const TextStyle(
+ fontSize: 17,
  fontWeight: FontWeight.bold,
- color: primary,
+ color: _kOrangePrimary,
  ),
  ),
  ],
@@ -267,13 +290,24 @@ class _CheckoutPageState extends State<CheckoutPage> {
  TextFormField(
  controller: _addressCtrl,
  maxLines: 3,
+ cursorColor: _kOrangePrimary,
  decoration: InputDecoration(
  hintText: 'Masukkan alamat lengkap pengiriman...',
+ hintStyle: TextStyle(color: onSurface.withValues(alpha: 0.35)),
  border: OutlineInputBorder(
- borderRadius: BorderRadius.circular(12),
+ borderRadius: BorderRadius.circular(14),
+ borderSide: const BorderSide(color: Color(0xFFF0F0F0)),
+ ),
+ enabledBorder: OutlineInputBorder(
+ borderRadius: BorderRadius.circular(14),
+ borderSide: const BorderSide(color: Color(0xFFF0F0F0)),
+ ),
+ focusedBorder: OutlineInputBorder(
+ borderRadius: BorderRadius.circular(14),
+ borderSide: const BorderSide(color: _kOrangePrimary, width: 1.5),
  ),
  filled: true,
- fillColor: surface,
+ fillColor: Colors.white,
  ),
  validator: (val) {
  if (val == null || val.trim().isEmpty) {
@@ -291,13 +325,24 @@ class _CheckoutPageState extends State<CheckoutPage> {
  TextFormField(
  controller: _notesCtrl,
  maxLines: 2,
+ cursorColor: _kOrangePrimary,
  decoration: InputDecoration(
  hintText: 'Tambahkan catatan untuk penjual...',
+ hintStyle: TextStyle(color: onSurface.withValues(alpha: 0.35)),
  border: OutlineInputBorder(
- borderRadius: BorderRadius.circular(12),
+ borderRadius: BorderRadius.circular(14),
+ borderSide: const BorderSide(color: Color(0xFFF0F0F0)),
+ ),
+ enabledBorder: OutlineInputBorder(
+ borderRadius: BorderRadius.circular(14),
+ borderSide: const BorderSide(color: Color(0xFFF0F0F0)),
+ ),
+ focusedBorder: OutlineInputBorder(
+ borderRadius: BorderRadius.circular(14),
+ borderSide: const BorderSide(color: _kOrangePrimary, width: 1.5),
  ),
  filled: true,
- fillColor: surface,
+ fillColor: Colors.white,
  ),
  ),
 
@@ -320,13 +365,15 @@ class _CheckoutPageState extends State<CheckoutPage> {
  // ── 5. Tombol Place Order ──────────────────────
  SizedBox(
  width: double.infinity,
+ height: 52,
  child: ElevatedButton(
  style: ElevatedButton.styleFrom(
- backgroundColor: primary,
+ backgroundColor: _kOrangePrimary,
  foregroundColor: Colors.white,
+ elevation: 0,
  padding: const EdgeInsets.symmetric(vertical: 16),
  shape: RoundedRectangleBorder(
- borderRadius: BorderRadius.circular(12),
+ borderRadius: BorderRadius.circular(14),
  ),
  ),
  onPressed: () => _placeOrder(context),
@@ -335,6 +382,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
  style: TextStyle(
  fontSize: 16,
  fontWeight: FontWeight.bold,
+ letterSpacing: 0.3,
  ),
  ),
  ),
@@ -359,8 +407,10 @@ class _SectionTitle extends StatelessWidget {
  Widget build(BuildContext context) {
  return Text(
  title,
- style: Theme.of(context).textTheme.titleMedium?.copyWith(
+ style: const TextStyle(
+ fontSize: 15,
  fontWeight: FontWeight.bold,
+ color: Color(0xFF2B2B2B),
  ),
  );
  }
@@ -396,8 +446,6 @@ class _PaymentOptionCard extends StatelessWidget {
 
  @override
  Widget build(BuildContext context) {
- final surface = Theme.of(context).colorScheme.surface;
- final primary = Theme.of(context).colorScheme.primary;
  final onSurface = Theme.of(context).colorScheme.onSurface;
 
  return GestureDetector(
@@ -406,19 +454,21 @@ class _PaymentOptionCard extends StatelessWidget {
  duration: const Duration(milliseconds: 200),
  margin: const EdgeInsets.only(bottom: 10),
  decoration: BoxDecoration(
- color: surface,
- borderRadius: BorderRadius.circular(12),
+ color: isSelected ? _kOrangeSoft : Colors.white,
+ borderRadius: BorderRadius.circular(14),
  border: Border.all(
- color: isSelected ? primary : Colors.transparent,
- width: 2,
+ color: isSelected ? _kOrangePrimary : const Color(0xFFF0F0F0),
+ width: isSelected ? 1.5 : 1,
  ),
- boxShadow: [
+ boxShadow: isSelected
+ ? [
  BoxShadow(
- color: Colors.black.withValues(alpha: 0.05),
- blurRadius: 6,
- offset: const Offset(0, 2),
+ color: _kOrangePrimary.withValues(alpha: 0.12),
+ blurRadius: 10,
+ offset: const Offset(0, 3),
  ),
- ],
+ ]
+ : [],
  ),
  child: Padding(
  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -462,18 +512,22 @@ class _PaymentOptionCard extends StatelessWidget {
  decoration: BoxDecoration(
  shape: BoxShape.circle,
  border: Border.all(
- color: isSelected ? primary : onSurface.withValues(alpha: 0.3),
+ color: isSelected
+ ? _kOrangePrimary
+ : onSurface.withValues(alpha: 0.3),
  width: 2,
  ),
  ),
  child: isSelected
- ? Center(
- child: Container(
+ ? const Center(
+ child: SizedBox(
  width: 10,
  height: 10,
+ child: DecoratedBox(
  decoration: BoxDecoration(
  shape: BoxShape.circle,
- color: primary,
+ color: _kOrangePrimary,
+ ),
  ),
  ),
  )
